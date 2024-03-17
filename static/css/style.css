@@ -1,0 +1,188 @@
+.body {
+    margin: 0;
+    padding: 0;
+    font-family: Vag World, sans-serif;
+    box-sizing: border-box;
+}
+
+.navbar-dark .dropdown-toggle::after {
+    display: none;
+}
+
+
+
+
+
+.header-select-level {
+    background-color: #f1f1f1;
+    padding: 5px;
+    text-align: center;
+    margin-bottom: 25vh;
+    padding-top: 15px;
+}
+
+.button-container-select-level {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.button-select-level {
+    width: 90%;
+    height: 60px;
+    margin: 15px;
+    padding: 10px;
+    background-color: orange;
+    font-family: Vag World, sans-serif;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 22px;
+}
+
+
+
+
+
+.header-mode1 {
+    background-color: #f1f1f1;
+    padding: 5px;
+    text-align: center;
+    padding-top: 15px;
+}
+
+.main-mode1 {
+    margin-top: 15px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    wight: 90vw;
+    height: 45vh;
+
+}
+.img-mode1 {
+    position: absolute;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.button-container-mode1 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-height: 100vh;
+    background-color: #333;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.button-container-mode1 button {
+    flex: 0 0 calc(50% - 20px);
+    margin: 10px;
+    padding: 10px;
+    color: black;
+    background-color: #4CAF50;
+    font-family: Vag World, sans-serif;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form-mode1 {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.input-mode1 {
+    width: 90vw;
+    height: 40px;
+    margin-top: 40px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-size: 18px;
+    background-color: orange;
+    border: 2px solid black;
+    text-align: center;
+}
+
+
+
+
+
+.h1-mode2 {
+    font-size: 25px;
+}
+
+.button-container-mode2 {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+
+
+
+
+.btn-img {
+    width: calc(20% - 10px);
+    height: calc(20vw - 10px);
+    margin-bottom: 10px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.button-audio-container {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn-audio {
+    width: 85vw;
+}
+
+
+
+
+
+.div-form {
+    margin: 10px;
+}
+.form {
+    margin-top: 25px;
+}
+.h1-form {
+    text-align: center;
+}
+
+.hr-form-login {
+    margin-top: 55px;
+}
+
+.hr-form-register {
+    margin-top: 45px;
+}
+
+.p-form-login {
+    margin-top: 40px;
+    margin-bottom: 30px;
+}
+
+.p-form-register {
+    margin-bottom: 20px;
+}

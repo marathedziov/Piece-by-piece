@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Собери животное</title>
+    <link rel="stylesheet" href="static/css/style.css">
+
+</head>
+{% if current_user.is_authenticated %}
+<body class="body">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <div class="dropdown">
+            <a class="navbar-brand dropdown-toggle" href="#" role="button" id="avatarDropdown"
+               data-bs-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">
+                <img src="static/img/ava.png">
+            </a>
+            <div class="dropdown-menu" aria-labelledby="avatarDropdown">
+                <a class="dropdown-item" href="#">Имя: {{ current_user.name }}</a>
+                <a class="dropdown-item" href="/logout">Выйти</a>
+            </div>
+        </div>
+
+        <a class="navbar-brand" href="#">{{user_points}}</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/select_level">Меню</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/update_level_one">1 режим</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/update_level_two">2 режим</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about_us">о нас</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="header-mode1">
+    {% if correct_question != len_lst_tasks %}
+    <h1 class="h1-mode2">{{question}}</h1>
+    {% else %}
+    <h1>Напиши на осетинском языке название собранного животного</h1>
+    {% endif %}
+</header>
+
+<main class="main-mode1">
+    {% for img in file_imgs %}
+    <img src="static/img/mode2/{{img}}" alt="{{ question }}" class="img-mode1">
+    {% endfor %}
+</main>
+
+{% if correct_question != len_lst_tasks %}
+<form method="POST" class="button-container-mode2">
+    {% for i in range(1, 6) %}
+    <button type="submit" class="btn btn-img" name="btn" value="{{ i }}"
+            style="background-image: url('static/img/mode2/{{ btn_imges[i-1] }}');"></button>
+    {% endfor %}
+</form>
+
+<div class="button-audio-container">
+    <button name="audio" class="btn-audio" data-src='static/sound/{{ correct_audio }}'>Послушать диктора</button>
+</div>
+
+{% else %}
+<form class="form-mode1">
+    <input type="text" id="animal" name="animal" class="input-mode1">
+</form>
+{% endif %}
+
+<script>
+    document.querySelector('.btn-audio').addEventListener('click', function() {
+        var audioSrc = this.getAttribute('data-src'); // Получаем путь к аудиофайлу из атрибута data-src
+        var audio = new Audio(audioSrc); // Создаем новый аудио элемент
+        audio.play(); // Воспроизводим аудио
+    });
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+{% endif %}
+</html>
