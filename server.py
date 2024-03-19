@@ -7,11 +7,11 @@ from pprint import pprint
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
-from flask import Flask, render_template, redirect, request
+from flask import Flask, render_template, redirect, request, jsonify
 from data import db_session
 from data.users import User
 from forms.user import RegisterForm, LoginForm
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 engine = create_engine('sqlite:///db/DataBase.db', echo=False)
 Base = declarative_base()
@@ -58,6 +58,9 @@ class Task:
     def __init__(self):
         self.correct_question = 0
         self.count_wrong_answer = 0
+        self.curent_hint = 0
+        self.btn_hint_text = "Подсказка"
+        self.hint_text = ""
         self.lst_tasks = []
         self.lst_imgs = []
 
@@ -90,8 +93,6 @@ class Task:
                 self.lst_tasks.append(lst_task)
             session.close()
 
-            return self.lst_tasks
-
         elif mode_value == 2:
             Session = sessionmaker(bind=engine)
             session = Session()
@@ -103,8 +104,7 @@ class Task:
                 lst_task = [mp3[0], png[0], answer[0]]
                 self.lst_tasks.append(lst_task)
             session.close()
-            return self.lst_tasks
-
+        random.shuffle(self.lst_tasks)
         self.texts_by_level(self.mode_value)
 
     def get_name_animal(self, random_id):
@@ -156,6 +156,7 @@ login_manager.init_app(app)
 def update_level():
     global user_points_mode1, user_points_mode2
     user_points_mode1, user_points_mode2 = 100, 100
+    task.curent_hint = 0
     task.restart_level()
     task.texts_by_level(task.mode_value)
 
@@ -250,7 +251,7 @@ user_points_mode1 = 100
 
 @app.route('/mode_one', methods=['GET', 'POST'])
 def mode_one():
-    global user_points_mode1, word
+    global user_points_mode1
     if request.method == 'POST':
         selected_answer = request.form.get('btn')
 
@@ -283,17 +284,49 @@ def mode_one():
                 sound_file = "static/sound/correct.mp3"
                 threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
 
+                db_sess = db_session.create_session()
+                user = db_sess.query(User).filter(User.id == current_user.id).first()
+                user.user_points_mode1 += user_points_mode1
+                db_sess.commit()
+
                 return redirect("/select_level")
             else:
 
                 sound_file = "static/sound/wrong.mp3"
                 threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
-                # сделать -очки и сделать подсказки
 
+        else:
+            flag = True
+            if task.curent_hint == 1:
+                task.hint_text = f"Букв в слове: {len(str(task.name_animal))}"
+                user_points_mode1 -= 10
+                task.btn_hint_text = "Подсказка"
+            elif task.curent_hint == 2:
+                task.hint_text = f"Первая буква: {str(task.name_animal)[0]}"
+                user_points_mode1 -= 10
+                task.btn_hint_text = "Сдаюсь"
+            elif task.curent_hint >= 3:
+                task.hint_text = f"Правильный ответ: {task.name_animal}"
+                user_points_mode1 = 0
+                flag = False
+            else:
+                task.hint_text = ""
+                task.btn_hint_text = "Подсказка"
+            task.curent_hint += 1  # обновление страницы когда делаю он +1 делает, а не должен
+            return render_template('mode_one.html', question=task.question,
+                                   btn_texts=task.list_button_text_mode1, file_imgs=task.lst_imgs,
+                                   user_points=user_points_mode1, correct_question=task.correct_question,
+                                   len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
+                                   curent_hint=task.curent_hint, hint_text=task.hint_text,
+                                   btn_hint_text=task.btn_hint_text,
+                                   flag=flag)
+    flag = True
     return render_template('mode_one.html', question=task.question,
                            btn_texts=task.list_button_text_mode1, file_imgs=task.lst_imgs,
                            user_points=user_points_mode1, correct_question=task.correct_question,
-                           len_lst_tasks=len(task.lst_tasks))
+                           len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
+                           curent_hint=task.curent_hint, hint_text=task.hint_text, btn_hint_text=task.btn_hint_text,
+                           flag=flag)
 
 
 user_points_mode2 = 100
@@ -335,22 +368,62 @@ def mode_two():
                 sound_file = "static/sound/correct.mp3"
                 threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
 
+                db_sess = db_session.create_session()
+                user = db_sess.query(User).filter(User.id == current_user.id).first()
+                user.user_points_mode2 += user_points_mode2
+                db_sess.commit()
+
                 return redirect("/select_level")
             else:
                 sound_file = "static/sound/wrong.mp3"
                 threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
-                # сделать -очки и сделать подсказки
-
+        else:
+            flag = True
+            if task.curent_hint == 1:
+                task.hint_text = f"Букв в слове: {len(str(task.name_animal))}"
+                user_points_mode2 -= 10
+                task.btn_hint_text = "Подсказка"
+            elif task.curent_hint == 2:
+                task.hint_text = f"Первая буква: {str(task.name_animal)[0]}"
+                user_points_mode2 -= 10
+                task.btn_hint_text = "Сдаюсь"
+            elif task.curent_hint >= 3:
+                task.hint_text = f"Правильный ответ: {task.name_animal}"
+                user_points_mode2 = 0
+                flag = False
+            else:
+                task.hint_text = ""
+                task.btn_hint_text = "Подсказка"
+            task.curent_hint += 1
+            return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
+                                   btn_imges=task.list_button_img_mode2, file_imgs=task.lst_imgs,
+                                   user_points=user_points_mode2, correct_audio=task.audio,
+                                   correct_question=task.correct_question,
+                                   len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
+                                   curent_hint=task.curent_hint, hint_text=task.hint_text,
+                                   btn_hint_text=task.btn_hint_text, flag=flag)
+    flag = True
     return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
                            btn_imges=task.list_button_img_mode2, file_imgs=task.lst_imgs,
                            user_points=user_points_mode2, correct_audio=task.audio,
                            correct_question=task.correct_question,
-                           len_lst_tasks=len(task.lst_tasks))
+                           len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
+                           curent_hint=task.curent_hint, hint_text=task.hint_text,
+                           btn_hint_text=task.btn_hint_text, flag=flag)
 
 
-@app.route('/about_us')
-def about_us():
-    return render_template('about_us.html')
+@app.route('/leader_board')
+def leader_board():
+    db_sess = db_session.create_session()
+    users = db_sess.query(User).all()
+
+    user_points = [(user.user_points_mode1 + user.user_points_mode2, user) for user in users]
+
+    sorted_users = sorted(user_points, key=lambda x: x[0], reverse=True)
+
+    enumerated_users = [(index + 1, user) for index, (_, user) in enumerate(sorted_users)]
+
+    return render_template('leader_board.html', users=enumerated_users)
 
 
 @app.route('/update_level_one')

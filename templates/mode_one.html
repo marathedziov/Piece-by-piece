@@ -43,7 +43,7 @@
                     <a class="nav-link" href="/update_level_two">2 режим</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/about_us">о нас</a>
+                    <a class="nav-link" href="/leader_board">список лидеров</a>
                 </li>
             </ul>
         </div>
@@ -68,9 +68,15 @@
         {% for btn_text in btn_texts %}
         <button type="submit" class="btn" name="btn" value="{{ btn_text }}">{{ btn_text }}</button>
         {% endfor %}
-{% else %}
+    {% else %}
     <form class="form-mode1">
         <input type="text" id="animal" name="animal" class="input-mode1">
+        {% if flag %}
+            <a type="button" class="btn btn-secondary" href="/mode_one">{{ btn_hint_text }}</a>
+        <p class="p-mode1">{{ hint_text }}</p>
+        {% elif not flag %}
+        <p class="p-mode1" style="margin-top: 38px;">{{ hint_text }}</p>
+        {% endif %}
     </form>
 {% endif %}
 </form>

@@ -107,7 +107,8 @@
 .input-mode1 {
     width: 90vw;
     height: 40px;
-    margin-top: 40px;
+    margin-top: 35px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 10px;
     box-sizing: border-box;
@@ -115,6 +116,10 @@
     background-color: orange;
     border: 2px solid black;
     text-align: center;
+}
+
+.p-mode1 {
+    margin-bottom: 0;
 }
 
 
@@ -132,11 +137,9 @@
     justify-content: space-between;
 }
 
-
-
-
-
 .btn-img {
+    max-width: 150px;
+    max-height: 150px;
     width: calc(20% - 10px);
     height: calc(20vw - 10px);
     margin-bottom: 10px;
@@ -154,6 +157,11 @@
 
 .btn-audio {
     width: 85vw;
+    height: 40px;
+    background-color: orange;
+    font-family: Vag World, sans-serif;
+    border-radius: 13px;
+    font-size: 18px;
 }
 
 
@@ -174,15 +182,42 @@
     margin-top: 55px;
 }
 
+.p-login {
+    margin-top: 54px;
+    margin-bottom: 25px;
+}
+
 .hr-form-register {
     margin-top: 45px;
 }
 
 .p-form-login {
     margin-top: 40px;
-    margin-bottom: 30px;
 }
 
 .p-form-register {
     margin-bottom: 20px;
+}
+
+
+
+
+table {
+    border-collapse: collapse;
+    width: 85%;
+    margin: auto;
+    margin-bottom: 30px;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: orange;
+}
+.h1-leader-board {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
 }
