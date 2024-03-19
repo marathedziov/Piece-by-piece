@@ -19,7 +19,7 @@ if [ ! -f $VIRTUALENV/bin/pip ]; then
 fi
 
 # Install the requirements
-$VIRTUALENV/bin/pip install -r requirements.txt
+$VIRTUALENV/bin/python3 -m pip install --no-cache-dir -r requirements.txt
 
 # Run your glorious application
 $VIRTUALENV/bin/python3 server.py
