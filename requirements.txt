@@ -3,3 +3,4 @@ werkzeug
 wtforms
 pygame
 flask
+flask_login

@@ -1,3 +1,4 @@
+import os
 import random
 
 import threading
@@ -422,7 +423,7 @@ def leader_board():
     sorted_users = sorted(user_points, key=lambda x: x[0], reverse=True)
 
     enumerated_users = [(index + 1, user) for index, (_, user) in enumerate(sorted_users)]
-
+    print(enumerated_users)
     return render_template('leader_board.html', users=enumerated_users)
 
 
@@ -448,4 +449,5 @@ def update_level_two():
 
 if __name__ == '__main__':
     db_session.global_init("db/DataBase.db")
-    app.run(port=8080, host='127.0.0.1')
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
