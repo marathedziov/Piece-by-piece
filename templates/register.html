@@ -58,7 +58,7 @@
         {{ form.hidden_tag() }}
         <p>
             {{ form.name.label }}<br>
-            {{ form.name(class="form-control") }}<br>
+            {{ form.name(class="form-control", maxlength="15") }}<br>
             {% for error in form.name.errors %}
         </p>
         <p class="alert alert-danger" role="alert">

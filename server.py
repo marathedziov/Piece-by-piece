@@ -2,7 +2,6 @@ import os
 import random
 
 import threading
-import pygame
 from pprint import pprint
 
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
@@ -161,12 +160,6 @@ def update_level():
     task.texts_by_level(task.mode_value)
 
 
-def play_sound_sync(file_path):
-    pygame.mixer.init()
-    pygame.mixer.music.load(file_path)
-    pygame.mixer.music.play()
-
-
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -176,7 +169,12 @@ def load_user(user_id):
 @app.route('/')
 @app.route('/index')
 def index():
-    return redirect('/register')
+    return render_template('main_window.html')
+
+
+@app.route('/rules')
+def rules():
+    return render_template('rules.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -259,8 +257,6 @@ def mode_one():
             task.lst_imgs.append(task.lst_tasks[task.correct_question - 1][2])
             task.count_wrong_answer = 0
             task.texts_by_level(task.mode_value)
-            sound_file = "static/sound/correct_button.mp3"
-            threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
         else:
             task.count_wrong_answer += 1
             task.user_points_mode1 -= 5
@@ -272,27 +268,17 @@ def mode_one():
             if task.user_points_mode1 < 0:
                 task.user_points_mode1 = 0
 
-            sound_file = "static/sound/wrong.mp3"
-            threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
-
     if request.method == 'GET':
         user_input = request.args.get('animal')
 
         if user_input is not None:
             if user_input.lower().strip() == task.name_animal:
-                sound_file = "static/sound/correct.mp3"
-                threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
-
                 db_sess = db_session.create_session()
                 user = db_sess.query(User).filter(User.id == current_user.id).first()
                 user.user_points_mode1 += task.user_points_mode1
                 db_sess.commit()
 
                 return redirect("/select_level")
-            else:
-
-                sound_file = "static/sound/wrong.mp3"
-                threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
 
         else:
             flag = True
@@ -311,7 +297,7 @@ def mode_one():
             else:
                 task.hint_text = ""
                 task.btn_hint_text = "Подсказка"
-            task.curent_hint += 1  # обновление страницы когда делаю он +1 делает, а не должен
+            task.curent_hint += 1
             return render_template('mode_one.html', question=task.question,
                                    btn_texts=task.list_button_text_mode1, file_imgs=task.lst_imgs,
                                    user_points=task.user_points_mode1, correct_question=task.correct_question,
@@ -338,9 +324,6 @@ def mode_two():
             task.count_wrong_answer = 0
             task.texts_by_level(task.mode_value)
 
-            sound_file = "static/sound/correct_button.mp3"
-            threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
-
         else:
             task.count_wrong_answer += 1
             task.user_points_mode2 -= 5
@@ -352,26 +335,17 @@ def mode_two():
             if task.user_points_mode2 < 0:
                 task.user_points_mode2 = 0
 
-            sound_file = "static/sound/wrong.mp3"
-            threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
-
     if request.method == 'GET':
         user_input = request.args.get('animal')
 
         if user_input is not None:
             if user_input.lower().strip() == task.name_animal:
-                sound_file = "static/sound/correct.mp3"
-                threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
-
                 db_sess = db_session.create_session()
                 user = db_sess.query(User).filter(User.id == current_user.id).first()
                 user.user_points_mode2 += task.user_points_mode2
                 db_sess.commit()
 
                 return redirect("/select_level")
-            else:
-                sound_file = "static/sound/wrong.mp3"
-                threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
         else:
             flag = True
             if task.curent_hint == 1:

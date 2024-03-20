@@ -225,7 +225,42 @@ th {
 
 
 
-.table {
-    max-width: 100vw;
-    max-height: 100vh;
+.div-main {
+    height: 100vh;
+    width: 100vw;
+
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.header-main {
+    margin: 10px;
+    padding: 5px;
+    text-align: center;
+    padding-top: 5px;
+    font-size: 34px;
+    color: black;
+}
+.main-about-project {
+    margin-top: 10px;
+    text-align: center;
+    line-height: 1.5;
+    background-color: rgba(179, 179, 179, 0.5);
+}
+.main-buttons-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+    margin-top: 75px;
+}
+.main-rules {
+    margin: 20px;
+    margin-top: 210px;
+}
+
+.main-rules a {
+    opacity: 0.9;
+    display: flex;
+    justify-content: center;
+    margin: 20px;
 }
