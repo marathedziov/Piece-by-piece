@@ -328,9 +328,6 @@ def mode_one():
                            flag=flag)
 
 
-
-
-
 @app.route('/mode_two', methods=['GET', 'POST'])
 def mode_two():
     if request.method == 'POST':

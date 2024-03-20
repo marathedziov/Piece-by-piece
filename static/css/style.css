@@ -221,3 +221,11 @@ th {
     margin-bottom: 20px;
     text-align: center;
 }
+
+
+
+
+.table {
+    max-width: 100vw;
+    max-height: 100vh;
+}
