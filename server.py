@@ -59,6 +59,8 @@ class Task:
     def __init__(self):
         self.correct_question = 0
         self.count_wrong_answer = 0
+        self.user_points_mode1 = 100
+        self.user_points_mode2 = 100
         self.curent_hint = 0
         self.btn_hint_text = "Подсказка"
         self.hint_text = ""
@@ -146,8 +148,6 @@ class Task:
         self.lst_imgs.clear()
 
 
-task = Task()
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
@@ -155,8 +155,7 @@ login_manager.init_app(app)
 
 
 def update_level():
-    global user_points_mode1, user_points_mode2
-    user_points_mode1, user_points_mode2 = 100, 100
+    task.user_points_mode1, task.user_points_mode2 = 100, 100
     task.curent_hint = 0
     task.restart_level()
     task.texts_by_level(task.mode_value)
@@ -252,7 +251,6 @@ user_points_mode1 = 100
 
 @app.route('/mode_one', methods=['GET', 'POST'])
 def mode_one():
-    global user_points_mode1
     if request.method == 'POST':
         selected_answer = request.form.get('btn')
 
@@ -265,14 +263,14 @@ def mode_one():
             threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
         else:
             task.count_wrong_answer += 1
-            user_points_mode1 -= 5
+            task.user_points_mode1 -= 5
             if task.count_wrong_answer == 2:
-                user_points_mode1 -= 5
+                task.user_points_mode1 -= 5
                 task.count_wrong_answer = 0
                 task.restart_level()
                 task.texts_by_level(task.mode_value)
-            if user_points_mode1 < 0:
-                user_points_mode1 = 0
+            if task.user_points_mode1 < 0:
+                task.user_points_mode1 = 0
 
             sound_file = "static/sound/wrong.mp3"
             threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
@@ -281,13 +279,13 @@ def mode_one():
         user_input = request.args.get('animal')
 
         if user_input is not None:
-            if user_input == task.name_animal:
+            if user_input.lower().strip() == task.name_animal:
                 sound_file = "static/sound/correct.mp3"
                 threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
 
                 db_sess = db_session.create_session()
                 user = db_sess.query(User).filter(User.id == current_user.id).first()
-                user.user_points_mode1 += user_points_mode1
+                user.user_points_mode1 += task.user_points_mode1
                 db_sess.commit()
 
                 return redirect("/select_level")
@@ -300,15 +298,15 @@ def mode_one():
             flag = True
             if task.curent_hint == 1:
                 task.hint_text = f"Букв в слове: {len(str(task.name_animal))}"
-                user_points_mode1 -= 10
+                task.user_points_mode1 -= 10
                 task.btn_hint_text = "Подсказка"
             elif task.curent_hint == 2:
                 task.hint_text = f"Первая буква: {str(task.name_animal)[0]}"
-                user_points_mode1 -= 10
+                task.user_points_mode1 -= 10
                 task.btn_hint_text = "Сдаюсь"
             elif task.curent_hint >= 3:
                 task.hint_text = f"Правильный ответ: {task.name_animal}"
-                user_points_mode1 = 0
+                task.user_points_mode1 = 0
                 flag = False
             else:
                 task.hint_text = ""
@@ -316,7 +314,7 @@ def mode_one():
             task.curent_hint += 1  # обновление страницы когда делаю он +1 делает, а не должен
             return render_template('mode_one.html', question=task.question,
                                    btn_texts=task.list_button_text_mode1, file_imgs=task.lst_imgs,
-                                   user_points=user_points_mode1, correct_question=task.correct_question,
+                                   user_points=task.user_points_mode1, correct_question=task.correct_question,
                                    len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
                                    curent_hint=task.curent_hint, hint_text=task.hint_text,
                                    btn_hint_text=task.btn_hint_text,
@@ -324,18 +322,17 @@ def mode_one():
     flag = True
     return render_template('mode_one.html', question=task.question,
                            btn_texts=task.list_button_text_mode1, file_imgs=task.lst_imgs,
-                           user_points=user_points_mode1, correct_question=task.correct_question,
+                           user_points=task.user_points_mode1, correct_question=task.correct_question,
                            len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
                            curent_hint=task.curent_hint, hint_text=task.hint_text, btn_hint_text=task.btn_hint_text,
                            flag=flag)
 
 
-user_points_mode2 = 100
+
 
 
 @app.route('/mode_two', methods=['GET', 'POST'])
 def mode_two():
-    global user_points_mode2
     if request.method == 'POST':
         selected_answer = request.form.get('btn')
         if selected_answer == task.lst_tasks[task.correct_question][2]:
@@ -349,14 +346,14 @@ def mode_two():
 
         else:
             task.count_wrong_answer += 1
-            user_points_mode2 -= 5
+            task.user_points_mode2 -= 5
             if task.count_wrong_answer == 3:
-                user_points_mode2 -= 5
+                task.user_points_mode2 -= 5
                 task.count_wrong_answer = 0
                 task.restart_level()
                 task.texts_by_level(task.mode_value)
-            if user_points_mode2 < 0:
-                user_points_mode2 = 0
+            if task.user_points_mode2 < 0:
+                task.user_points_mode2 = 0
 
             sound_file = "static/sound/wrong.mp3"
             threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
@@ -365,13 +362,13 @@ def mode_two():
         user_input = request.args.get('animal')
 
         if user_input is not None:
-            if user_input == task.name_animal:
+            if user_input.lower().strip() == task.name_animal:
                 sound_file = "static/sound/correct.mp3"
                 threading.Thread(target=play_sound_sync, args=(sound_file,)).start()
 
                 db_sess = db_session.create_session()
                 user = db_sess.query(User).filter(User.id == current_user.id).first()
-                user.user_points_mode2 += user_points_mode2
+                user.user_points_mode2 += task.user_points_mode2
                 db_sess.commit()
 
                 return redirect("/select_level")
@@ -382,15 +379,15 @@ def mode_two():
             flag = True
             if task.curent_hint == 1:
                 task.hint_text = f"Букв в слове: {len(str(task.name_animal))}"
-                user_points_mode2 -= 10
+                task.user_points_mode2 -= 10
                 task.btn_hint_text = "Подсказка"
             elif task.curent_hint == 2:
                 task.hint_text = f"Первая буква: {str(task.name_animal)[0]}"
-                user_points_mode2 -= 10
+                task.user_points_mode2 -= 10
                 task.btn_hint_text = "Сдаюсь"
             elif task.curent_hint >= 3:
                 task.hint_text = f"Правильный ответ: {task.name_animal}"
-                user_points_mode2 = 0
+                task.user_points_mode2 = 0
                 flag = False
             else:
                 task.hint_text = ""
@@ -398,7 +395,7 @@ def mode_two():
             task.curent_hint += 1
             return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
                                    btn_imges=task.list_button_img_mode2, file_imgs=task.lst_imgs,
-                                   user_points=user_points_mode2, correct_audio=task.audio,
+                                   user_points=task.user_points_mode2, correct_audio=task.audio,
                                    correct_question=task.correct_question,
                                    len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
                                    curent_hint=task.curent_hint, hint_text=task.hint_text,
@@ -406,7 +403,7 @@ def mode_two():
     flag = True
     return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
                            btn_imges=task.list_button_img_mode2, file_imgs=task.lst_imgs,
-                           user_points=user_points_mode2, correct_audio=task.audio,
+                           user_points=task.user_points_mode2, correct_audio=task.audio,
                            correct_question=task.correct_question,
                            len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
                            curent_hint=task.curent_hint, hint_text=task.hint_text,
@@ -449,5 +446,7 @@ def update_level_two():
 
 if __name__ == '__main__':
     db_session.global_init("db/DataBase.db")
+    task = Task()
+
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
