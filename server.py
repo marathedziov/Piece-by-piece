@@ -275,7 +275,8 @@ def mode_one():
                 db_sess.commit()
 
                 return redirect("/select_level")
-
+            else:
+                task.user_points_mode1 -= 5
         else:
             task.flag_hint = True
             if task.curent_hint == 1:
@@ -341,6 +342,8 @@ def mode_two():
                 db_sess.commit()
 
                 return redirect("/select_level")
+            else:
+                task.user_points_mode1 -= 5
         else:
             task.flag_hint = True
             if task.curent_hint == 1:
