@@ -225,6 +225,7 @@ th {
 
 
 
+
 .div-main {
     height: 100vh;
     width: 100vw;
@@ -234,8 +235,7 @@ th {
     background-position: center;
 }
 .header-main {
-    margin: 10px;
-    padding: 5px;
+    padding: 15px;
     text-align: center;
     padding-top: 5px;
     font-size: 34px;
@@ -251,7 +251,7 @@ th {
     display: flex;
     justify-content: center;
     margin: 20px;
-    margin-top: 75px;
+    margin-top: 65px;
 }
 .main-rules {
     margin: 20px;

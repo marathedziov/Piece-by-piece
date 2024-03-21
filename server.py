@@ -1,7 +1,6 @@
 import os
 import random
 
-import threading
 from pprint import pprint
 
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
@@ -147,17 +146,25 @@ class Task:
         self.lst_imgs.clear()
 
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-
 def update_level():
     task.user_points_mode1, task.user_points_mode2 = 100, 100
     task.curent_hint = 0
     task.restart_level()
     task.texts_by_level(task.mode_value)
+
+
+def get_all_from_task(mode_value):
+    random_id = task.get_random_id(mode_value)
+    print(random_id)
+    task.get_tasks_by_random_id(random_id, mode_value)
+    pprint(task.lst_tasks)
+    task.get_name_animal(random_id)
+
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 @login_manager.user_loader
@@ -223,14 +230,6 @@ def logout():
     return redirect("/")
 
 
-def get_all_from_task(mode_value):
-    random_id = task.get_random_id(mode_value)
-    print(random_id)
-    task.get_tasks_by_random_id(random_id, mode_value)
-    pprint(task.lst_tasks)
-    task.get_name_animal(random_id)
-
-
 @app.route('/select_level', methods=['GET', 'POST'])
 def select_level():
     if request.method == 'POST':
@@ -242,9 +241,6 @@ def select_level():
             return redirect("/update_level_two")
 
     return render_template('select_level.html')
-
-
-user_points_mode1 = 100
 
 
 @app.route('/mode_one', methods=['GET', 'POST'])

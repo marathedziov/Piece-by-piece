@@ -18,12 +18,10 @@
                aria-haspopup="true" aria-expanded="false">
                 <img src="static/img/ava.png">
             </a>
-            {% if current_user.is_authenticated %}
             <div class="dropdown-menu" aria-labelledby="avatarDropdown">
                 <a class="dropdown-item" href="#">Имя: {{ current_user.name }}</a>
                 <a class="dropdown-item" href="/logout">Выйти</a>
             </div>
-            {% endif %}
         </div>
 
         <a class="navbar-brand" href="#">{{user_points}}</a>
@@ -42,6 +40,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/update_level_two">2 режим</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/">На главную</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/leader_board">список лидеров</a>
