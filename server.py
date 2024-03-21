@@ -57,81 +57,81 @@ class Task:
     def __init__(self):
         self.correct_question = 0
         self.count_wrong_answer = 0
+        self.mode_value = 0
         self.user_points_mode1 = 100
         self.user_points_mode2 = 100
         self.curent_hint = 0
         self.btn_hint_text = "Подсказка"
+        self.flag_hint = True
         self.hint_text = ""
         self.lst_tasks = []
         self.lst_imgs = []
 
-    def get_random_id(self, mode_value):
-        self.mode_value = mode_value
+    def get_random_id(self):
+        self.mode_value = self.mode_value
 
         Session = sessionmaker(bind=engine)
         session = Session()
 
-        query = session.query(Animal.id).filter(Animal.mode == mode_value)
+        query = session.query(Animal.id).filter(Animal.mode == self.mode_value)
         self.ides = [animal[0] for animal in query.all()]
 
         session.close()
 
         self.random_id = random.choice(self.ides)
 
-        return self.random_id
-
-    def get_tasks_by_random_id(self, random_id, mode_value):
-        if mode_value == 1:
+    def get_tasks_by_random_id(self):
+        if self.mode_value == 1:
             Session = sessionmaker(bind=engine)
             session = Session()
 
-            query_tasks = session.query(ModeOne.tasks).filter(ModeOne.id_animal == random_id)
-            query_pnges = session.query(ModeOne.answers).filter(ModeOne.id_animal == random_id)
-            query_pngs = session.query(ModeOne.png).filter(ModeOne.id_animal == random_id)
+            query_tasks = session.query(ModeOne.tasks).filter(ModeOne.id_animal == self.random_id)
+            query_pnges = session.query(ModeOne.answers).filter(ModeOne.id_animal == self.random_id)
+            query_pngs = session.query(ModeOne.png).filter(ModeOne.id_animal == self.random_id)
 
             for task, answer, png in zip(query_tasks, query_pnges, query_pngs):
                 lst_task = [task[0], answer[0], png[0]]
                 self.lst_tasks.append(lst_task)
             session.close()
 
-        elif mode_value == 2:
+        elif self.mode_value == 2:
             Session = sessionmaker(bind=engine)
             session = Session()
 
-            query_mp3es = session.query(ModeTwo.mp3).filter(ModeTwo.id_animal == random_id)
-            query_pnges = session.query(ModeTwo.png).filter(ModeTwo.id_animal == random_id)
-            query_answers = session.query(ModeTwo.answer).filter(ModeTwo.id_animal == random_id)
+            query_mp3es = session.query(ModeTwo.mp3).filter(ModeTwo.id_animal == self.random_id)
+            query_pnges = session.query(ModeTwo.png).filter(ModeTwo.id_animal == self.random_id)
+            query_answers = session.query(ModeTwo.answer).filter(ModeTwo.id_animal == self.random_id)
             for mp3, png, answer in zip(query_mp3es, query_pnges, query_answers):
                 lst_task = [mp3[0], png[0], answer[0]]
                 self.lst_tasks.append(lst_task)
             session.close()
         random.shuffle(self.lst_tasks)
-        self.texts_by_level(self.mode_value)
+        self.texts_by_level()
 
-    def get_name_animal(self, random_id):
+    def get_name_animal(self):
         Session = sessionmaker(bind=engine)
         session = Session()
 
-        self.name_animal = session.query(Animal.oset_name).filter(Animal.id == random_id).first()
+        self.name_animal = session.query(Animal.oset_name).filter(Animal.id == self.random_id).first()
         session.close()
         self.name_animal = self.name_animal[0]
 
-    def texts_by_level(self, mode_value):
+    def texts_by_level(self):
         if self.correct_question != len(self.lst_tasks):
-            if mode_value == 1:
-                list_random_wrong_words = []
-                while len(list_random_wrong_words) < 3:
+            if self.mode_value == 1:
+                self.list_random_wrong_words = []
+                while len(self.list_random_wrong_words) < 3:
                     random_index = random.choice(range(len(self.lst_tasks)))
-                    if random_index != self.correct_question and random_index not in list_random_wrong_words:
-                        list_random_wrong_words.append(random_index)
+                    if random_index != self.correct_question and random_index not in self.list_random_wrong_words:
+                        self.list_random_wrong_words.append(random_index)
 
                 self.list_button_text_mode1 = [self.lst_tasks[self.correct_question][1],
-                                               self.lst_tasks[list_random_wrong_words[0]][1],
-                                               self.lst_tasks[list_random_wrong_words[1]][1],
-                                               self.lst_tasks[list_random_wrong_words[2]][1]]
+                                               self.lst_tasks[self.list_random_wrong_words[0]][1],
+                                               self.lst_tasks[self.list_random_wrong_words[1]][1],
+                                               self.lst_tasks[self.list_random_wrong_words[2]][1]]
                 random.shuffle(self.list_button_text_mode1)
                 self.question = self.lst_tasks[task.correct_question][0]
-            elif mode_value == 2:
+            elif self.mode_value == 2:
                 Session = sessionmaker(bind=engine)
                 session = Session()
 
@@ -150,15 +150,15 @@ def update_level():
     task.user_points_mode1, task.user_points_mode2 = 100, 100
     task.curent_hint = 0
     task.restart_level()
-    task.texts_by_level(task.mode_value)
+    task.texts_by_level()
 
 
-def get_all_from_task(mode_value):
-    random_id = task.get_random_id(mode_value)
-    print(random_id)
-    task.get_tasks_by_random_id(random_id, mode_value)
+def get_all_from_task():
+    task.get_random_id()
+    print(task.random_id)
+    task.get_tasks_by_random_id()
     pprint(task.lst_tasks)
-    task.get_name_animal(random_id)
+    task.get_name_animal()
 
 
 app = Flask(__name__)
@@ -252,7 +252,7 @@ def mode_one():
             task.correct_question += 1
             task.lst_imgs.append(task.lst_tasks[task.correct_question - 1][2])
             task.count_wrong_answer = 0
-            task.texts_by_level(task.mode_value)
+            task.texts_by_level()
         else:
             task.count_wrong_answer += 1
             task.user_points_mode1 -= 5
@@ -260,7 +260,7 @@ def mode_one():
                 task.user_points_mode1 -= 5
                 task.count_wrong_answer = 0
                 task.restart_level()
-                task.texts_by_level(task.mode_value)
+                task.texts_by_level()
             if task.user_points_mode1 < 0:
                 task.user_points_mode1 = 0
 
@@ -277,7 +277,7 @@ def mode_one():
                 return redirect("/select_level")
 
         else:
-            flag = True
+            task.flag_hint = True
             if task.curent_hint == 1:
                 task.hint_text = f"Букв в слове: {len(str(task.name_animal))}"
                 task.user_points_mode1 -= 10
@@ -289,7 +289,7 @@ def mode_one():
             elif task.curent_hint >= 3:
                 task.hint_text = f"Правильный ответ: {task.name_animal}"
                 task.user_points_mode1 = 0
-                flag = False
+                task.flag_hint = False
             else:
                 task.hint_text = ""
                 task.btn_hint_text = "Подсказка"
@@ -299,15 +299,14 @@ def mode_one():
                                    user_points=task.user_points_mode1, correct_question=task.correct_question,
                                    len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
                                    curent_hint=task.curent_hint, hint_text=task.hint_text,
-                                   btn_hint_text=task.btn_hint_text,
-                                   flag=flag)
-    flag = True
+                                   btn_hint_text=task.btn_hint_text, flag=task.flag_hint)
+    task.flag_hint = True
     return render_template('mode_one.html', question=task.question,
                            btn_texts=task.list_button_text_mode1, file_imgs=task.lst_imgs,
                            user_points=task.user_points_mode1, correct_question=task.correct_question,
                            len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
-                           curent_hint=task.curent_hint, hint_text=task.hint_text, btn_hint_text=task.btn_hint_text,
-                           flag=flag)
+                           curent_hint=task.curent_hint, hint_text=task.hint_text,
+                           btn_hint_text=task.btn_hint_text, flag=task.flag_hint)
 
 
 @app.route('/mode_two', methods=['GET', 'POST'])
@@ -318,7 +317,7 @@ def mode_two():
             task.correct_question += 1
             task.lst_imgs.append(task.lst_tasks[task.correct_question - 1][1])
             task.count_wrong_answer = 0
-            task.texts_by_level(task.mode_value)
+            task.texts_by_level()
 
         else:
             task.count_wrong_answer += 1
@@ -327,7 +326,7 @@ def mode_two():
                 task.user_points_mode2 -= 5
                 task.count_wrong_answer = 0
                 task.restart_level()
-                task.texts_by_level(task.mode_value)
+                task.texts_by_level()
             if task.user_points_mode2 < 0:
                 task.user_points_mode2 = 0
 
@@ -343,7 +342,7 @@ def mode_two():
 
                 return redirect("/select_level")
         else:
-            flag = True
+            task.flag_hint = True
             if task.curent_hint == 1:
                 task.hint_text = f"Букв в слове: {len(str(task.name_animal))}"
                 task.user_points_mode2 -= 10
@@ -355,7 +354,7 @@ def mode_two():
             elif task.curent_hint >= 3:
                 task.hint_text = f"Правильный ответ: {task.name_animal}"
                 task.user_points_mode2 = 0
-                flag = False
+                task.flag_hint = False
             else:
                 task.hint_text = ""
                 task.btn_hint_text = "Подсказка"
@@ -366,15 +365,15 @@ def mode_two():
                                    correct_question=task.correct_question,
                                    len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
                                    curent_hint=task.curent_hint, hint_text=task.hint_text,
-                                   btn_hint_text=task.btn_hint_text, flag=flag)
-    flag = True
+                                   btn_hint_text=task.btn_hint_text, flag=task.flag_hint)
+    task.flag_hint = True
     return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
                            btn_imges=task.list_button_img_mode2, file_imgs=task.lst_imgs,
                            user_points=task.user_points_mode2, correct_audio=task.audio,
                            correct_question=task.correct_question,
                            len_lst_tasks=len(task.lst_tasks), name_animal=task.name_animal,
                            curent_hint=task.curent_hint, hint_text=task.hint_text,
-                           btn_hint_text=task.btn_hint_text, flag=flag)
+                           btn_hint_text=task.btn_hint_text, flag=task.flag_hint)
 
 
 @app.route('/leader_board')
@@ -394,8 +393,8 @@ def leader_board():
 @app.route('/update_level_one')
 def update_level_one():
     task.lst_tasks.clear()
-    mode_value = 1
-    get_all_from_task(mode_value)
+    task.mode_value = 1
+    get_all_from_task()
 
     update_level()
     return redirect("/mode_one")
@@ -404,8 +403,8 @@ def update_level_one():
 @app.route('/update_level_two')
 def update_level_two():
     task.lst_tasks.clear()
-    mode_value = 2
-    get_all_from_task(mode_value)
+    task.mode_value = 2
+    get_all_from_task()
 
     update_level()
     return redirect("/mode_two")
