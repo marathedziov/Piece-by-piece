@@ -324,8 +324,11 @@ def mode_one():
                 return redirect("/select_level")
             else:
                 user_points_mode1 -= 5
+                if user_points_mode1 < 0:
+                    user_points_mode1 = 0
                 response = make_response()
                 response.set_cookie('user_points_mode1', str(user_points_mode1))
+
         else:
             response = make_response()
             response.set_cookie('flag_hint', 'True')
@@ -346,6 +349,8 @@ def mode_one():
             else:
                 hint_text = ""
                 btn_hint_text = "Подсказка"
+            if user_points_mode1 < 0:
+                user_points_mode1 = 0
             curent_hint += 1
 
             response.set_cookie('hint_text', str(hint_text))
@@ -438,6 +443,8 @@ def mode_two():
                 return redirect("/select_level")
             else:
                 user_points_mode2 -= 5
+                if user_points_mode2 < 0:
+                    user_points_mode2 = 0
                 response = make_response()
                 response.set_cookie('user_points_mode2', str(user_points_mode2))
 
@@ -461,6 +468,8 @@ def mode_two():
             else:
                 hint_text = ""
                 btn_hint_text = "Подсказка"
+            if user_points_mode2 < 0:
+                user_points_mode2 = 0
             curent_hint += 1
 
             response.set_cookie('hint_text', str(hint_text))
