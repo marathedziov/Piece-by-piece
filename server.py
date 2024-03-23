@@ -29,7 +29,6 @@ class Task:
         session["user_points_mode2"] = 100
         session["current_hint"] = 0
         session["btn_hint_text"] = "Подсказка"
-        session["flag_hint"] = True
         session["hint_text"] = ""
         session["lst_tasks"] = []
         session["lst_imgs"] = []
@@ -265,8 +264,6 @@ def mode_one():
     name_animal = session.get('name_animal')
     user_points_mode1 = session.get('user_points_mode1')
     current_hint = session.get('current_hint')
-    flag_hint = session.get('flag_hint')
-    print(flag_hint)
     list_button_text_mode1 = json.loads(session.get('list_button_text_mode1'))
     print("mode_one", list_button_text_mode1)
     print(lst_tasks)
@@ -280,7 +277,13 @@ def mode_one():
 
     if request.method == 'POST':
         print('POst')
+
         selected_answer = request.form.get('btn')
+        print("selected_answer", selected_answer)
+        btn_answer = request.form.get('answer')
+        btn_hint = request.form.get('hint')
+        print("btn click", btn_answer, btn_hint)
+
         if current_question == len(lst_tasks):
             user_input = request.form.get('animal')
             flag_animal = task.check_answer_animal(user_input)
@@ -293,29 +296,76 @@ def mode_one():
         elif selected_answer == lst_tasks[current_question][1]:
             current_question += 1
             lst_imgs.append(lst_tasks[current_question - 1][2])
+            session["lst_imgs"] = json.dumps(lst_imgs)
             count_wrong_answer = 0
+            session["count_wrong_answer"] = count_wrong_answer
             session["current_question"] = current_question
             task.texts_by_level()
 
         else:
             count_wrong_answer += 1
             user_points_mode1 -= 5
+            session["count_wrong_answer"] = count_wrong_answer
             if count_wrong_answer == 2:
                 user_points_mode1 -= 5
                 count_wrong_answer = 0
+                session["user_points_mode1"] = user_points_mode1
+                session["count_wrong_answer"] = count_wrong_answer
                 task.restart_level()
                 task.texts_by_level()
             if user_points_mode1 < 0:
                 user_points_mode1 = 0
-
-        session["lst_imgs"] = json.dumps(lst_imgs)
-        session["count_wrong_answer"] = count_wrong_answer
-        session["user_points_mode1"] = user_points_mode1
+            session["user_points_mode1"] = user_points_mode1
 
         list_button_text_mode1 = json.loads(session.get('list_button_text_mode1'))
         if current_question < len(lst_tasks):
             question = lst_tasks[current_question][0]
         print("Post", list_button_text_mode1)
+
+        if btn_hint is not None:
+            current_hint = session.get('current_hint')
+            name_animal = session.get('name_animal')
+            current_hint += 1
+            session["current_hint"] = current_hint
+            print('подсказка по счету', current_hint)
+            btn_hint_text = "Подсказка"
+            hint_text = ""
+            if current_hint == 1:
+                hint_text = f"Букв в слове: {len(str(name_animal))}"
+                user_points_mode1 -= 10
+                btn_hint_text = "Подсказка"
+            elif current_hint == 2:
+                hint_text = f"Первая буква: {name_animal[0]}"
+                user_points_mode1 -= 10
+                btn_hint_text = "Сдаюсь"
+            elif current_hint >= 3:
+                hint_text = f"Правильный ответ: {name_animal}"
+                user_points_mode1 = 0
+            if user_points_mode1 < 0:
+                user_points_mode1 = 0
+
+            print("подсказка", hint_text)
+            session["hint_text"] = hint_text
+            session["user_points_mode1"] = user_points_mode1
+            session["btn_hint_text"] = btn_hint_text
+
+            t = session.get('list_button_text_mode1', '')
+            print(t)
+            list_button_text_mode1 = json.loads(session.get('list_button_text_mode1', []))
+            lst_imgs = json.loads(session.get('lst_imgs', []))
+            current_question = session.get('current_question', 1)
+            lst_tasks = json.loads(session.get('lst_tasks', []))
+            if current_question < len(lst_tasks):
+                question = lst_tasks[current_question][0]
+            else:
+                question = ""
+
+            return render_template('mode_one.html', question=question,
+                                   btn_texts=list_button_text_mode1, file_imgs=lst_imgs,
+                                   user_points=user_points_mode1, correct_question=current_question,
+                                   len_lst_tasks=len(lst_tasks), name_animal=name_animal,
+                                   curent_hint=current_hint, hint_text=hint_text,
+                                   btn_hint_text=btn_hint_text)
 
     if request.method == 'GET':
         print('Get')
@@ -335,70 +385,17 @@ def mode_one():
                 user_points_mode1 = 0
             session["user_points_mode1"] = user_points_mode1
 
-    else:
-        session["flag_hint"] = True
-        curent_hint = session.get('curent_hint')
-        name_animal = session.get('name_animal')
-        if current_hint == 1:
-            hint_text = f"Букв в слове: {len(str(name_animal))}"
-            user_points_mode1 -= 10
-            btn_hint_text = "Подсказка"
-        elif current_hint == 2:
-            hint_text = f"Первая буква: {name_animal[0]}"
-            user_points_mode1 -= 10
-            btn_hint_text = "Сдаюсь"
-        elif current_hint >= 3:
-            hint_text = f"Правильный ответ: {name_animal}"
-            user_points_mode1 = 0
-            flag_hint = False
-        else:
-            hint_text = ""
-            btn_hint_text = "Подсказка"
-        if user_points_mode1 < 0:
-            user_points_mode1 = 0
-        current_hint += 1
-
-        session["hint_text"] = hint_text
-        session["user_points_mode1"] = user_points_mode1
-        session["btn_hint_text"] = btn_hint_text
-        session["flag_hint"] = flag_hint
-
-        t = session.get('list_button_text_mode1', '')
-        print(t)
-        list_button_text_mode1 = json.loads(session.get('list_button_text_mode1', []))
-        lst_imgs = json.loads(session.get('lst_imgs', []))
-        current_question = session.get('current_question', 1)
-        lst_tasks = json.loads(session.get('lst_tasks', []))
-        if current_question < len(lst_tasks):
-            question = lst_tasks[current_question][0]
-        else:
-            question = ""
-
-        return render_template('mode_one.html', question=question,
-                               btn_texts=list_button_text_mode1, file_imgs=lst_imgs,
-                               user_points=user_points_mode1, correct_question=current_question,
-                               len_lst_tasks=len(lst_tasks), name_animal=name_animal,
-                               curent_hint=curent_hint, hint_text=hint_text,
-                               btn_hint_text=btn_hint_text, flag=flag_hint)
-
-    ###
-    print("hint")
-    flag_hint = True
-    session["flag_hint"] = flag_hint
-
-    # try:
-    #     question = lst_tasks[current_question][0]
-    #     print("try")
-    # except Exception as e:
-    #     question = e
-    #     print()
+    try:
+        question = lst_tasks[current_question][0]
+    except Exception as e:
+        question = e
     print("render")
     return render_template('mode_one.html', question=question,
                            btn_texts=list_button_text_mode1, file_imgs=lst_imgs,
                            user_points=user_points_mode1, correct_question=current_question,
                            len_lst_tasks=len(lst_tasks), name_animal=name_animal,
                            curent_hint=current_hint, hint_text=hint_text,
-                           btn_hint_text=btn_hint_text, flag=flag_hint)
+                           btn_hint_text=btn_hint_text)
 
 
 @app.route('/mode_two', methods=['GET', 'POST'])
@@ -457,33 +454,30 @@ def mode_two():
                 response.set_cookie('user_points_mode2', str(user_points_mode2))
 
         else:
-            response = make_response()
-            response.set_cookie('flag_hint', 'True')
-            curent_hint = int(request.cookies.get('curent_hint'))
+
+            current_hint = int(request.cookies.get('current_hint'))
             name_animal = request.cookies.get('name_animal')
             if curent_hint == 1:
                 hint_text = f"Букв в слове: {len(str(name_animal))}"
                 user_points_mode2 -= 10
                 btn_hint_text = "Подсказка"
-            elif curent_hint == 2:
+            elif current_hint == 2:
                 hint_text = f"Первая буква: {name_animal[0]}"
                 user_points_mode2 -= 10
                 btn_hint_text = "Сдаюсь"
-            elif curent_hint >= 3:
+            elif current_hint >= 3:
                 hint_text = f"Правильный ответ: {name_animal}"
                 user_points_mode2 = 0
-                flag_hint = False
             else:
                 hint_text = ""
                 btn_hint_text = "Подсказка"
             if user_points_mode2 < 0:
                 user_points_mode2 = 0
-            curent_hint += 1
+            current_hint += 1
 
             response.set_cookie('hint_text', str(hint_text))
             response.set_cookie('user_points_mode2', str(user_points_mode2))
             response.set_cookie('btn_hint_text', str(btn_hint_text))
-            response.set_cookie('flag_hint', str(flag_hint))
 
             list_button_img_mode2 = eval(request.cookies.get('list_button_img_mode2'))
             lst_imgs = eval(request.cookies.get('lst_imgs'))
@@ -496,11 +490,8 @@ def mode_two():
                                    user_points=user_points_mode2, correct_audio=audio,
                                    correct_question=correct_question,
                                    len_lst_tasks=len(lst_tasks), name_animal=name_animal,
-                                   curent_hint=curent_hint, hint_text=hint_text,
-                                   btn_hint_text=btn_hint_text, flag=flag_hint)
-    flag_hint = True
-    response = make_response()
-    response.set_cookie('flag_hint', str(flag_hint))
+                                   curent_hint=current_hint, hint_text=hint_text,
+                                   btn_hint_text=btn_hint_text)
 
     list_button_img_mode2 = eval(request.cookies.get('list_button_img_mode2'))
     lst_imgs = eval(request.cookies.get('lst_imgs'))
@@ -509,7 +500,7 @@ def mode_two():
     correct_question = int(request.cookies.get('correct_question'))
     lst_tasks = eval(request.cookies.get('lst_tasks'))
     name_animal = request.cookies.get('name_animal')
-    curent_hint = int(request.cookies.get('curent_hint'))
+    current_hint = int(request.cookies.get('current_hint'))
     hint_text = request.cookies.get('hint_text')
     btn_hint_text = request.cookies.get('btn_hint_text')
 
@@ -518,8 +509,8 @@ def mode_two():
                            user_points=user_points_mode2, correct_audio=audio,
                            correct_question=correct_question,
                            len_lst_tasks=len(lst_tasks), name_animal=name_animal,
-                           curent_hint=curent_hint, hint_text=hint_text,
-                           btn_hint_text=btn_hint_text, flag=flag_hint)
+                           curent_hint=current_hint, hint_text=hint_text,
+                           btn_hint_text=btn_hint_text)
 
 
 @app.route('/leader_board')
