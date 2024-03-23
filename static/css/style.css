@@ -245,6 +245,7 @@ th {
     margin-top: 10px;
     text-align: center;
     line-height: 1.5;
+    font-size: 14px;
     background-color: rgba(179, 179, 179, 0.5);
 }
 .main-buttons-container {
@@ -257,8 +258,19 @@ th {
     margin: 20px;
     margin-top: 210px;
 }
+.main-back-main {
+    margin: 20px;
+    margin-top: 80px;
+}
 
 .main-rules a {
+    opacity: 0.9;
+    display: flex;
+    justify-content: center;
+    margin: 20px;
+}
+
+.main-back-main a {
     opacity: 0.9;
     display: flex;
     justify-content: center;

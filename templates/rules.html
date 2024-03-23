@@ -10,47 +10,52 @@
 </head>
 <body class="body">
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
+    <div class="container-fluid">
 
-            <div class="dropdown">
-                <a class="navbar-brand dropdown-toggle" href="#" role="button" id="avatarDropdown"
-                   data-bs-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    <img src="static/img/ava.png">
-                </a>
-                {% if current_user.is_authenticated %}
-                <div class="dropdown-menu" aria-labelledby="avatarDropdown">
-                    <a class="dropdown-item" href="#">Имя: {{ current_user.name }}</a>
-                    <a class="dropdown-item" href="/logout">Выйти</a>
-                </div>
-                {% endif %}
-            </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        <div class="dropdown">
+            <a class="navbar-brand dropdown-toggle" href="#" role="button" id="avatarDropdown"
+               data-bs-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">
+                <img src="static/img/ava.png">
+            </a>
             {% if current_user.is_authenticated %}
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/select_level">Меню</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/leader_board">список лидеров</a>
-                    </li>
-                </ul>
+            <div class="dropdown-menu" aria-labelledby="avatarDropdown">
+                <a class="dropdown-item" href="#">Имя: {{ current_user.name }}</a>
+                <a class="dropdown-item" href="/logout">Выйти</a>
             </div>
             {% endif %}
         </div>
-    </nav>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        {% if current_user.is_authenticated %}
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/select_level">Меню</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/leader_board">список лидеров</a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</nav>
 
 <div class="div-main" style="background-image: url('static/img/bg3.jpg');">
 
     <header class="header-main">Правила<br>"Собери животное"</header>
     <div class="main-about-project">
-        <p>В игре есть два режима, в первом режиме тебе предстоит отвечать на вопросы, нажимая на кнопки с вариантами ответов, если ответить правильно, то появится та часть животного, о которой спрашиволось в задание</p>
+        <p>В игре 2 режима: 1) собрать животное из картинок и 2) собрать животное из геометрических фигур. За каждый
+            неверный ответ отнимается 5 очков из максимальных 100 очков. Если подряд даны неверные ответы ( 2 в первом
+            режиме и 3 во втором режиме), то игра начинается заново. Когда животное собрано, требуется написать его
+            название. Тут есть 3 подсказки, за каждую снимается 10 очков. Используя последнюю, пользователю открывается
+            правильный ответ, но отнимаются все очки. Буква 'æ' считается как 2 символа/буквы (писать: 'ае'), так же
+            как и буквы 'хъ', 'къ'.</p>
     </div>
-    <div class="main-rules">
+    <div class="main-back-main">
         <a class="btn btn-secondary" href="/">Вернуться</a>
     </div>
 

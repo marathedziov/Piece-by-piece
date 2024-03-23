@@ -38,10 +38,10 @@
                             <a class="nav-link" href="/select_level">Меню</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/update_level_one">1 режим</a>
+                            <a class="nav-link" href="/mode_one">1 режим</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/update_level_two">2 режим</a>
+                            <a class="nav-link" href="/mode_two">2 режим</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="/">На главную</a>
@@ -75,8 +75,9 @@
                 {% endfor %}
            </form>
         {% else %}
-            <form class="form-mode1">
+            <form method="POST" class="form-mode1">
                 <input type="text" id="animal" name="animal" class="input-mode1">
+                <button type="submit" name="answer" class="btn btn-primary" href="/mode_one" style="margin-bottom: 15px;">Ответить</button>
                 {% if flag %}
                     <a type="button" class="btn btn-secondary" href="/mode_one">{{ btn_hint_text }}</a>
                     <p class="p-mode1">{{ hint_text }}</p>

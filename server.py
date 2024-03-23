@@ -16,7 +16,8 @@ from data.animals import Animal
 from data.ModeOne import ModeOne
 from data.ModeTwo import ModeTwo
 
-#Base.metadata.create_all(engine)
+
+# Base.metadata.create_all(engine)
 
 
 class Task:
@@ -47,7 +48,7 @@ class Task:
                 session["random_id"] = random_id
 
     def get_tasks_by_random_id(self):
-
+        print("Getting tasks by random")
         mode_value = session.get("mode_value", 1)
         random_id = session.get("random_id", 1)
 
@@ -59,7 +60,7 @@ class Task:
             for i_task in query_tasks:
                 lst_task = [i_task.tasks, i_task.answers, i_task.png]
                 lst_tasks.append(lst_task)
-
+            random.shuffle(lst_tasks)
             session["lst_tasks"] = json.dumps(lst_tasks)
 
         elif mode_value == 2:
@@ -75,7 +76,7 @@ class Task:
 
             session["lst_tasks"] = json.dumps(lst_tasks)
 
-        self.texts_by_level()
+        # self.texts_by_level()
 
     def get_name_animal(self):
         session_db = db_session.create_session()
@@ -87,9 +88,10 @@ class Task:
         session['name_animal'] = name_animal[0]
 
     def texts_by_level(self):
+        print("texts_by_level")
         mode_value = session.get('mode_value', 1)
-        current_question = session.get('correct_question', 1)
-        lst_tasks = json.loads(session.get('lst_tasks', ''))
+        current_question = session.get('current_question', 1)
+        lst_tasks = json.loads(session.get('lst_tasks', []))
         random_id = session.get('random_id', 1)
 
         if current_question < len(lst_tasks):
@@ -103,7 +105,8 @@ class Task:
                                           lst_tasks[list_random_wrong_words[0]][1],
                                           lst_tasks[list_random_wrong_words[1]][1],
                                           lst_tasks[list_random_wrong_words[2]][1]]
-
+                print("texts_by_level", list_button_text_mode1)
+                print(lst_tasks[current_question][1])
                 random.shuffle(list_button_text_mode1)
                 session["list_button_text_mode1"] = json.dumps(list_button_text_mode1)
             elif mode_value == 2:
@@ -132,9 +135,22 @@ class Task:
         self.texts_by_level()
 
     def get_all_from_task(self):
+        print("get_all_from_task")
         task.get_random_id()
         task.get_tasks_by_random_id()
         task.get_name_animal()
+
+    def check_answer_animal(self, user_input):
+        print("check_answer_animal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        name_animal = session.get('name_animal')
+        user_points_mode1 = session.get('user_points_mode1')
+        if user_input.lower().strip() == name_animal:
+            print("daaaaaaaaaaaaaaaaaa")
+            db_sess = db_session.create_session()
+            user = db_sess.query(User).filter(User.id == current_user.id).first()
+            user.user_points_mode1 += user_points_mode1
+            db_sess.commit()
+            return True
 
 
 app = Flask(__name__)
@@ -210,18 +226,22 @@ def logout():
 
 @app.route('/select_level', methods=['GET', 'POST'])
 def select_level():
+    print("select_level")
     if request.method == 'POST':
         selected_mode = request.form.get('btn')
 
         if selected_mode == "1":
             session['mode_value'] = 1
-            #return redirect("/update_level_one")
+            task.get_all_from_task()
+            task.update_level()
+            # return redirect("/update_level_one")
             return redirect("/mode_one")
         elif selected_mode == "2":
             session['mode_value'] = 1
             return redirect("/update_level_two")
 
     return render_template('select_level.html')
+
 
 @app.route('/update_level_one')
 def update_level_one():
@@ -235,23 +255,48 @@ def update_level_one():
 
 @app.route('/mode_one', methods=['GET', 'POST'])
 def mode_one():
-    print("mode one")
+    print("event mode one")
+    current_question = session.get('current_question')
+    print("mode_one current_question", current_question)
+
+    lst_tasks = json.loads(session.get('lst_tasks', ''))
+    lst_imgs = json.loads(session.get('lst_imgs', ''))
+    count_wrong_answer = session.get('count_wrong_answer')
+    name_animal = session.get('name_animal')
+    user_points_mode1 = session.get('user_points_mode1')
+    current_hint = session.get('current_hint')
+    flag_hint = session.get('flag_hint')
+    print(flag_hint)
+    list_button_text_mode1 = json.loads(session.get('list_button_text_mode1'))
+    print("mode_one", list_button_text_mode1)
+    print(lst_tasks)
+    print("mode_one current_question", current_question)
+    if current_question < len(lst_tasks):
+        question = lst_tasks[current_question][0]
+        print(question)
+
+    hint_text = session.get('hint_text')
+    btn_hint_text = session.get('btn_hint_text')
+
     if request.method == 'POST':
         print('POst')
         selected_answer = request.form.get('btn')
+        if current_question == len(lst_tasks):
+            user_input = request.form.get('animal')
+            flag_animal = task.check_answer_animal(user_input)
+            if flag_animal:
+                return redirect("/select_level")
+            else:
+                user_points_mode1 -= 5
+                session["user_points_mode1"] = user_points_mode1
 
-        lst_tasks = json.loads(session.get("lst_tasks"))
-        current_question = session.get('current_question')
-        lst_tasks = json.loads(session.get('lst_tasks'))
-        lst_imgs = json.loads(session.get('lst_imgs'))
-        count_wrong_answer = session.get('count_wrong_answer')
-        user_points_mode1 = session.get('user_points_mode1')
-
-        if selected_answer == lst_tasks[current_question][1]:
+        elif selected_answer == lst_tasks[current_question][1]:
             current_question += 1
             lst_imgs.append(lst_tasks[current_question - 1][2])
             count_wrong_answer = 0
+            session["current_question"] = current_question
             task.texts_by_level()
+
         else:
             count_wrong_answer += 1
             user_points_mode1 -= 5
@@ -263,113 +308,96 @@ def mode_one():
             if user_points_mode1 < 0:
                 user_points_mode1 = 0
 
-        session["current_question"] = current_question
         session["lst_imgs"] = json.dumps(lst_imgs)
         session["count_wrong_answer"] = count_wrong_answer
         session["user_points_mode1"] = user_points_mode1
 
+        list_button_text_mode1 = json.loads(session.get('list_button_text_mode1'))
+        if current_question < len(lst_tasks):
+            question = lst_tasks[current_question][0]
+        print("Post", list_button_text_mode1)
+
     if request.method == 'GET':
         print('Get')
+        user_input = request.args.get('animal')
 
-        task.get_all_from_task()
-        print('Update level one')
-        task.update_level()
-        print('Update level')
+        if user_input is not None:
+            flag_animal = task.check_answer_animal(user_input)
+            if flag_animal:
+                return redirect("/select_level")
+            else:
+                user_points_mode1 -= 5
+                session["user_points_mode1"] = user_points_mode1
 
-        #user_input = request.args.get('animal')
+        else:
+            user_points_mode1 -= 5
+            if user_points_mode1 < 0:
+                user_points_mode1 = 0
+            session["user_points_mode1"] = user_points_mode1
+
+    else:
+        session["flag_hint"] = True
+        curent_hint = session.get('curent_hint')
         name_animal = session.get('name_animal')
-        user_points_mode1 = session.get('user_points_mode1')
-        current_hint = session.get('current_hint')
-        flag_hint = session.get('flag_hint')
+        if current_hint == 1:
+            hint_text = f"Букв в слове: {len(str(name_animal))}"
+            user_points_mode1 -= 10
+            btn_hint_text = "Подсказка"
+        elif current_hint == 2:
+            hint_text = f"Первая буква: {name_animal[0]}"
+            user_points_mode1 -= 10
+            btn_hint_text = "Сдаюсь"
+        elif current_hint >= 3:
+            hint_text = f"Правильный ответ: {name_animal}"
+            user_points_mode1 = 0
+            flag_hint = False
+        else:
+            hint_text = ""
+            btn_hint_text = "Подсказка"
+        if user_points_mode1 < 0:
+            user_points_mode1 = 0
+        current_hint += 1
 
-        # if user_input is not None:
-        #     if user_input.lower().strip() == name_animal:
-        #         db_sess = db_session.create_session()
-        #         user = db_sess.query(User).filter(User.id == current_user.id).first()
-        #         user.user_points_mode1 += user_points_mode1
-        #         db_sess.commit()
-        #
-        #         return redirect("/select_level")
-        #     else:
-        #         user_points_mode1 -= 5
-        #         if user_points_mode1 < 0:
-        #             user_points_mode1 = 0
-        #         session["user_points_mode1"] = user_points_mode1
-        #
-        # else:
-        #     session["flag_hint"] = True
-        #     curent_hint = session.get('curent_hint')
-        #     name_animal = session.get('name_animal')
-        #     if current_hint == 1:
-        #         hint_text = f"Букв в слове: {len(str(name_animal))}"
-        #         user_points_mode1 -= 10
-        #         btn_hint_text = "Подсказка"
-        #     elif current_hint == 2:
-        #         hint_text = f"Первая буква: {name_animal[0]}"
-        #         user_points_mode1 -= 10
-        #         btn_hint_text = "Сдаюсь"
-        #     elif current_hint >= 3:
-        #         hint_text = f"Правильный ответ: {name_animal}"
-        #         user_points_mode1 = 0
-        #         flag_hint = False
-        #     else:
-        #         hint_text = ""
-        #         btn_hint_text = "Подсказка"
-        #     if user_points_mode1 < 0:
-        #         user_points_mode1 = 0
-        #     current_hint += 1
+        session["hint_text"] = hint_text
+        session["user_points_mode1"] = user_points_mode1
+        session["btn_hint_text"] = btn_hint_text
+        session["flag_hint"] = flag_hint
 
-    #         session["hint_text"] = hint_text
-    #         session["user_points_mode1"] = user_points_mode1
-    #         session["btn_hint_text"] = btn_hint_text
-    #         session["flag_hint"] = flag_hint
-    #
-    #         question = session.get('question')
-    #         t = session.get('list_button_text_mode1', '')
-    #         print(t)
-    #         #list_button_text_mode1 = json.loads()
-    #         lst_imgs = json.loads(session.get('lst_imgs', ''))
-    #         current_question = session.get('current_question')
-    #         lst_tasks = json.loads(session.get('lst_tasks'))
-    #
-    #         return render_template('mode_one.html', question=question,
-    #                                btn_texts=list_button_text_mode1, file_imgs=lst_imgs,
-    #                                user_points=user_points_mode1, correct_question=current_question,
-    #                                len_lst_tasks=len(lst_tasks), name_animal=name_animal,
-    #                                curent_hint=curent_hint, hint_text=hint_text,
-    #                                btn_hint_text=btn_hint_text, flag=flag_hint)
-    # ###
+        t = session.get('list_button_text_mode1', '')
+        print(t)
+        list_button_text_mode1 = json.loads(session.get('list_button_text_mode1', []))
+        lst_imgs = json.loads(session.get('lst_imgs', []))
+        current_question = session.get('current_question', 1)
+        lst_tasks = json.loads(session.get('lst_tasks', []))
+        if current_question < len(lst_tasks):
+            question = lst_tasks[current_question][0]
+        else:
+            question = ""
+
+        return render_template('mode_one.html', question=question,
+                               btn_texts=list_button_text_mode1, file_imgs=lst_imgs,
+                               user_points=user_points_mode1, correct_question=current_question,
+                               len_lst_tasks=len(lst_tasks), name_animal=name_animal,
+                               curent_hint=curent_hint, hint_text=hint_text,
+                               btn_hint_text=btn_hint_text, flag=flag_hint)
+
+    ###
     print("hint")
     flag_hint = True
     session["flag_hint"] = flag_hint
 
-
-    list_button_text_mode1 = json.loads(session.get('list_button_text_mode1'))
-    lst_imgs = json.loads(session.get('lst_imgs'))
-    user_points_mode1 = session.get('user_points_mode1')
-    current_question = session.get('current_question')
-    lst_tasks = json.loads(session.get('lst_tasks'))
-    question = lst_tasks[current_question][0]
-    name_animal = session.get('name_animal')
-    curent_hint = session.get('curent_hint')
-    hint_text = session.get('hint_text')
-    btn_hint_text = session.get('btn_hint_text')
-    print(question)
-    print(list_button_text_mode1)
-    print(lst_imgs)
-    print(user_points_mode1)
-    print(current_question)
-    print(len(lst_tasks))
-    print(name_animal)
-    print(curent_hint)
-    print(hint_text)
-    print(btn_hint_text)
-    print(flag_hint)
+    # try:
+    #     question = lst_tasks[current_question][0]
+    #     print("try")
+    # except Exception as e:
+    #     question = e
+    #     print()
+    print("render")
     return render_template('mode_one.html', question=question,
                            btn_texts=list_button_text_mode1, file_imgs=lst_imgs,
                            user_points=user_points_mode1, correct_question=current_question,
                            len_lst_tasks=len(lst_tasks), name_animal=name_animal,
-                           curent_hint=curent_hint, hint_text=hint_text,
+                           curent_hint=current_hint, hint_text=hint_text,
                            btn_hint_text=btn_hint_text, flag=flag_hint)
 
 
@@ -506,8 +534,6 @@ def leader_board():
     enumerated_users = [(index + 1, user) for index, (_, user) in enumerate(sorted_users)]
     print(enumerated_users)
     return render_template('leader_board.html', users=enumerated_users)
-
-
 
 
 @app.route('/update_level_two')
