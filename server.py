@@ -1,14 +1,17 @@
 import os
 import random
 import json
+
 from flask import Flask, render_template, redirect, request, session, make_response
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+
 from data import db_session
 from data.users import User
 from data.animals import Animal
 from data.ModeOne import ModeOne
 from data.ModeTwo import ModeTwo
 from forms.user import RegisterForm, LoginForm
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+
 
 
 class Task:
