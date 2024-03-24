@@ -38,12 +38,6 @@
                     <a class="nav-link" href="/select_level">Меню</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/mode_one">1 режим</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/mode_two">2 режим</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="/">На главную</a>
                 </li>
                 <li class="nav-item">
@@ -82,14 +76,11 @@
 </div>
 
 {% else %}
-<form class="form-mode1">
+<form method="POST" class="form-mode1">
     <input type="text" id="animal" name="animal" class="input-mode1">
-    {% if flag %}
-        <a type="button" class="btn btn-secondary" href="/mode_two">{{ btn_hint_text }}</a>
+    <button type="submit" name="answer" class="btn btn-primary" value="answer" style="margin-bottom: 15px;">Ответить</button>
+    <button type="submit" name="hint" class="btn btn-secondary" value="hint">{{ btn_hint_text }}</button>
     <p class="p-mode1">{{ hint_text }}</p>
-    {% elif not flag %}
-    <p class="p-mode1" style="margin-top: 38px;">{{ hint_text }}</p>
-    {% endif %}
     </form>
 {% endif %}
 
