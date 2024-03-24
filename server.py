@@ -291,6 +291,8 @@ def mode_one():
                 return redirect("/select_level")
             else:
                 user_points_mode1 -= 5
+                if user_points_mode1 < 0:
+                    user_points_mode1 = 0
                 session["user_points_mode1"] = user_points_mode1
 
         elif selected_answer == lst_tasks[current_question][1]:
@@ -398,119 +400,119 @@ def mode_one():
                            btn_hint_text=btn_hint_text)
 
 
-@app.route('/mode_two', methods=['GET', 'POST'])
-def mode_two():
-    if request.method == 'POST':
-        selected_answer = request.form.get('btn')
-
-        lst_tasks = eval(request.cookies.get('lst_tasks'))
-        correct_question = int(request.cookies.get('correct_question'))
-        lst_tasks = eval(request.cookies.get('lst_tasks'))
-        lst_imgs = eval(request.cookies.get('lst_imgs'))
-        count_wrong_answer = int(request.cookies.get('count_wrong_answer'))
-        user_points_mode2 = int(request.cookies.get('user_points_mode2'))
-
-        if selected_answer == lst_tasks[correct_question][2]:
-            correct_question += 1
-            lst_imgs.append(lst_tasks[correct_question - 1][1])
-            count_wrong_answer = 0
-            task.texts_by_level()
-
-        else:
-            count_wrong_answer += 1
-            user_points_mode2 -= 5
-            if count_wrong_answer == 2:
-                user_points_mode2 -= 5
-                count_wrong_answer = 0
-                task.restart_level()
-                task.texts_by_level()
-            if user_points_mode2 < 0:
-                user_points_mode2 = 0
-        response = make_response()
-        response.set_cookie('correct_question', str(correct_question))
-        response.set_cookie('lst_imgs', str(lst_imgs))
-        response.set_cookie('count_wrong_answer', str(count_wrong_answer))
-        response.set_cookie('user_points_mode2', str(user_points_mode2))
-
-    if request.method == 'GET':
-        user_input = request.args.get('animal')
-
-        name_animal = request.cookies.get('name_animal')
-        user_points_mode2 = int(request.cookies.get('user_points_mode2'))
-
-        if user_input is not None:
-            if user_input.lower().strip() == name_animal:
-                db_sess = db_session.create_session()
-                user = db_sess.query(User).filter(User.id == current_user.id).first()
-                user.user_points_mode2 += user_points_mode2
-                db_sess.commit()
-
-                return redirect("/select_level")
-            else:
-                user_points_mode2 -= 5
-                if user_points_mode2 < 0:
-                    user_points_mode2 = 0
-                response = make_response()
-                response.set_cookie('user_points_mode2', str(user_points_mode2))
-
-        else:
-
-            current_hint = int(request.cookies.get('current_hint'))
-            name_animal = request.cookies.get('name_animal')
-            if curent_hint == 1:
-                hint_text = f"Букв в слове: {len(str(name_animal))}"
-                user_points_mode2 -= 10
-                btn_hint_text = "Подсказка"
-            elif current_hint == 2:
-                hint_text = f"Первая буква: {name_animal[0]}"
-                user_points_mode2 -= 10
-                btn_hint_text = "Сдаюсь"
-            elif current_hint >= 3:
-                hint_text = f"Правильный ответ: {name_animal}"
-                user_points_mode2 = 0
-            else:
-                hint_text = ""
-                btn_hint_text = "Подсказка"
-            if user_points_mode2 < 0:
-                user_points_mode2 = 0
-            current_hint += 1
-
-            response.set_cookie('hint_text', str(hint_text))
-            response.set_cookie('user_points_mode2', str(user_points_mode2))
-            response.set_cookie('btn_hint_text', str(btn_hint_text))
-
-            list_button_img_mode2 = eval(request.cookies.get('list_button_img_mode2'))
-            lst_imgs = eval(request.cookies.get('lst_imgs'))
-            correct_question = int(request.cookies.get('correct_question'))
-            lst_tasks = eval(request.cookies.get('lst_tasks'))
-            audio = request.cookies.get('audio')
-
-            return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
-                                   btn_imges=list_button_img_mode2, file_imgs=lst_imgs,
-                                   user_points=user_points_mode2, correct_audio=audio,
-                                   correct_question=correct_question,
-                                   len_lst_tasks=len(lst_tasks), name_animal=name_animal,
-                                   curent_hint=current_hint, hint_text=hint_text,
-                                   btn_hint_text=btn_hint_text)
-
-    list_button_img_mode2 = eval(request.cookies.get('list_button_img_mode2'))
-    lst_imgs = eval(request.cookies.get('lst_imgs'))
-    user_points_mode2 = int(request.cookies.get('user_points_mode2'))
-    audio = request.cookies.get('audio')
-    correct_question = int(request.cookies.get('correct_question'))
-    lst_tasks = eval(request.cookies.get('lst_tasks'))
-    name_animal = request.cookies.get('name_animal')
-    current_hint = int(request.cookies.get('current_hint'))
-    hint_text = request.cookies.get('hint_text')
-    btn_hint_text = request.cookies.get('btn_hint_text')
-
-    return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
-                           btn_imges=list_button_img_mode2, file_imgs=lst_imgs,
-                           user_points=user_points_mode2, correct_audio=audio,
-                           correct_question=correct_question,
-                           len_lst_tasks=len(lst_tasks), name_animal=name_animal,
-                           curent_hint=current_hint, hint_text=hint_text,
-                           btn_hint_text=btn_hint_text)
+# @app.route('/mode_two', methods=['GET', 'POST'])
+# def mode_two():
+#     if request.method == 'POST':
+#         selected_answer = request.form.get('btn')
+#
+#         lst_tasks = eval(request.cookies.get('lst_tasks'))
+#         correct_question = int(request.cookies.get('correct_question'))
+#         lst_tasks = eval(request.cookies.get('lst_tasks'))
+#         lst_imgs = eval(request.cookies.get('lst_imgs'))
+#         count_wrong_answer = int(request.cookies.get('count_wrong_answer'))
+#         user_points_mode2 = int(request.cookies.get('user_points_mode2'))
+#
+#         if selected_answer == lst_tasks[correct_question][2]:
+#             correct_question += 1
+#             lst_imgs.append(lst_tasks[correct_question - 1][1])
+#             count_wrong_answer = 0
+#             task.texts_by_level()
+#
+#         else:
+#             count_wrong_answer += 1
+#             user_points_mode2 -= 5
+#             if count_wrong_answer == 2:
+#                 user_points_mode2 -= 5
+#                 count_wrong_answer = 0
+#                 task.restart_level()
+#                 task.texts_by_level()
+#             if user_points_mode2 < 0:
+#                 user_points_mode2 = 0
+#         response = make_response()
+#         response.set_cookie('correct_question', str(correct_question))
+#         response.set_cookie('lst_imgs', str(lst_imgs))
+#         response.set_cookie('count_wrong_answer', str(count_wrong_answer))
+#         response.set_cookie('user_points_mode2', str(user_points_mode2))
+#
+#     if request.method == 'GET':
+#         user_input = request.args.get('animal')
+#
+#         name_animal = request.cookies.get('name_animal')
+#         user_points_mode2 = int(request.cookies.get('user_points_mode2'))
+#
+#         if user_input is not None:
+#             if user_input.lower().strip() == name_animal:
+#                 db_sess = db_session.create_session()
+#                 user = db_sess.query(User).filter(User.id == current_user.id).first()
+#                 user.user_points_mode2 += user_points_mode2
+#                 db_sess.commit()
+#
+#                 return redirect("/select_level")
+#             else:
+#                 user_points_mode2 -= 5
+#                 if user_points_mode2 < 0:
+#                     user_points_mode2 = 0
+#                 response = make_response()
+#                 response.set_cookie('user_points_mode2', str(user_points_mode2))
+#
+#         else:
+#
+#             current_hint = int(request.cookies.get('current_hint'))
+#             name_animal = request.cookies.get('name_animal')
+#             if curent_hint == 1:
+#                 hint_text = f"Букв в слове: {len(str(name_animal))}"
+#                 user_points_mode2 -= 10
+#                 btn_hint_text = "Подсказка"
+#             elif current_hint == 2:
+#                 hint_text = f"Первая буква: {name_animal[0]}"
+#                 user_points_mode2 -= 10
+#                 btn_hint_text = "Сдаюсь"
+#             elif current_hint >= 3:
+#                 hint_text = f"Правильный ответ: {name_animal}"
+#                 user_points_mode2 = 0
+#             else:
+#                 hint_text = ""
+#                 btn_hint_text = "Подсказка"
+#             if user_points_mode2 < 0:
+#                 user_points_mode2 = 0
+#             current_hint += 1
+#
+#             # response.set_cookie('hint_text', str(hint_text))
+#             # response.set_cookie('user_points_mode2', str(user_points_mode2))
+#             # response.set_cookie('btn_hint_text', str(btn_hint_text))
+#
+#             list_button_img_mode2 = eval(request.cookies.get('list_button_img_mode2'))
+#             lst_imgs = eval(request.cookies.get('lst_imgs'))
+#             correct_question = int(request.cookies.get('correct_question'))
+#             lst_tasks = eval(request.cookies.get('lst_tasks'))
+#             audio = request.cookies.get('audio')
+#
+#             return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
+#                                    btn_imges=list_button_img_mode2, file_imgs=lst_imgs,
+#                                    user_points=user_points_mode2, correct_audio=audio,
+#                                    correct_question=correct_question,
+#                                    len_lst_tasks=len(lst_tasks), name_animal=name_animal,
+#                                    curent_hint=current_hint, hint_text=hint_text,
+#                                    btn_hint_text=btn_hint_text)
+#
+#     list_button_img_mode2 = eval(request.cookies.get('list_button_img_mode2'))
+#     lst_imgs = eval(request.cookies.get('lst_imgs'))
+#     user_points_mode2 = int(request.cookies.get('user_points_mode2'))
+#     audio = request.cookies.get('audio')
+#     correct_question = int(request.cookies.get('correct_question'))
+#     lst_tasks = eval(request.cookies.get('lst_tasks'))
+#     name_animal = request.cookies.get('name_animal')
+#     current_hint = int(request.cookies.get('current_hint'))
+#     hint_text = request.cookies.get('hint_text')
+#     btn_hint_text = request.cookies.get('btn_hint_text')
+#
+#     return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
+#                            btn_imges=list_button_img_mode2, file_imgs=lst_imgs,
+#                            user_points=user_points_mode2, correct_audio=audio,
+#                            correct_question=correct_question,
+#                            len_lst_tasks=len(lst_tasks), name_animal=name_animal,
+#                            curent_hint=current_hint, hint_text=hint_text,
+#                            btn_hint_text=btn_hint_text)
 
 
 @app.route('/leader_board')
