@@ -2,7 +2,7 @@ import os
 import random
 import json
 
-from flask import Flask, render_template, redirect, request, session, make_response
+from flask import Flask, render_template, redirect, request, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 from data import db_session
@@ -13,14 +13,13 @@ from data.ModeTwo import ModeTwo
 from forms.user import RegisterForm, LoginForm
 
 
-
 class Task:
     def __init__(self):
         session["current_question"] = 0
         session["count_wrong_answer"] = 0
         session["mode_value"] = 0
-        session["user_points_mode1"] = 100
-        session["user_points_mode2"] = 100
+        session["user_points_mode1"] = 105
+        session["user_points_mode2"] = 105
         session["current_hint"] = 0
         session["btn_hint_text"] = "Подсказка"
         session["hint_text"] = ""
@@ -108,8 +107,8 @@ class Task:
         session["lst_imgs"] = json.dumps([])
 
     def update_level(self):
-        session["user_points_mode1"] = 100
-        session["user_points_mode2"] = 100
+        session["user_points_mode1"] = 105
+        session["user_points_mode2"] = 105
         session["current_hint"] = 0
 
         self.restart_level()

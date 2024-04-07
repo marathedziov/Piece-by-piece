@@ -12,19 +12,19 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        {% if current_user.is_authenticated %}
         <div class="dropdown">
             <a class="navbar-brand dropdown-toggle" href="#" role="button" id="avatarDropdown"
                data-bs-toggle="dropdown"
                aria-haspopup="true" aria-expanded="false">
                 <img src="static/img/ava.png">
             </a>
+            {% if current_user.is_authenticated %}
             <div class="dropdown-menu" aria-labelledby="avatarDropdown">
                 <a class="dropdown-item" href="#">Имя: {{ current_user.name }}</a>
                 <a class="dropdown-item" href="/logout">Выйти</a>
             </div>
+             {% endif %}
         </div>
-        {% endif %}
         <a class="navbar-brand" href="#">{{user_points}}</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
