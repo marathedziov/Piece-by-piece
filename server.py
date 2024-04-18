@@ -109,6 +109,10 @@ class Task:
     def update_level(self):
         session["user_points_mode1"] = 105
         session["user_points_mode2"] = 105
+
+        session["current_hint"] = 0
+        session["current_hint"] = 0
+
         session["current_hint"] = 0
 
         self.restart_level()
@@ -306,6 +310,9 @@ def mode_one():
                 user_points_mode1 = 0
             if user_points_mode1 < 0:
                 user_points_mode1 = 0
+            else:
+                btn_hint_text = "Подсказка"
+                hint_text = ""
 
             session["hint_text"] = hint_text
             session["user_points_mode1"] = user_points_mode1
