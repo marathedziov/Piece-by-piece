@@ -226,10 +226,14 @@ th {
 
 
 
-.div-main {
+body, .div-main {
     height: 100vh;
+    margin: 0;
+    overflow-x: hidden; /* Prevent horizontal overflow */
+}
+.div-main {
     width: 100vw;
-
+    background-image: url('static/img/bg3.jpg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -262,14 +266,12 @@ th {
     margin: 20px;
     margin-top: 80px;
 }
-
 .main-rules a {
     opacity: 0.9;
     display: flex;
     justify-content: center;
     margin: 20px;
 }
-
 .main-back-main a {
     opacity: 0.9;
     display: flex;
