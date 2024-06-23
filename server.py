@@ -4,13 +4,14 @@ import json
 
 from flask import Flask, render_template, redirect, request, session
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.utils import secure_filename
 
 from data import db_session
 from data.users import User
 from data.animals import Animal
 from data.ModeOne import ModeOne
 from data.ModeTwo import ModeTwo
-from forms.user import RegisterForm, LoginForm
+from forms.user import RegisterForm, LoginForm, LevelForm
 
 
 class Task:
@@ -179,6 +180,7 @@ def reqister():
                                    message="Пользователь с таким именем уже есть")
         user = User(
             name=form.name.data,
+            user_type=form.user_type.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -225,6 +227,8 @@ def select_level():
             task.get_all_from_task()
             task.update_level()
             return redirect("/mode_two")
+        elif selected_mode == "0":
+            return redirect("/additional_mode")
 
     return render_template('select_level.html')
 
@@ -523,6 +527,37 @@ def leader_board():
 
     enumerated_users = [(index + 1, user) for index, (_, user) in enumerate(sorted_users)]
     return render_template('leader_board.html', users=enumerated_users)
+
+
+@app.route('/additional_mode')
+def additional_mode():
+    return render_template('additional_mode.html')
+
+
+levels_data = []
+
+
+@app.route('/editor', methods=['GET', 'POST'])
+def editor():
+    form = LevelForm()
+    if request.method == 'POST':
+        level_name = form.level_name.data
+        for level in form.levels.entries:
+            word = level.word.data
+            translation = level.translation.data
+            image = level.image.data
+
+            levels_data.append({
+                'level_name': level_name,
+                'word': word,
+                'translation': translation,
+                'image_filename': secure_filename(image.filename)
+            })
+        print(levels_data)
+        levels_data.clear()
+        return redirect('/editor')
+
+    return render_template('editor.html', form=form, levels_data=levels_data)
 
 
 if __name__ == '__main__':

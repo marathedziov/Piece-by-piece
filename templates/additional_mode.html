@@ -11,7 +11,6 @@
 </head>
 {% if current_user.is_authenticated %}
 <body class="body">
-
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <div class="dropdown">
@@ -50,21 +49,7 @@
 </nav>
 
 <div>
-    <header class="header-select-level">
-        <h1>Выберите режим игры:</h1>
-    </header>
 
-    <form method="POST" class="button-container-select-level">
-        <button type="submit" class="btn button-select-level" name="btn" value="1">Первый режим</button>
-    </form>
-
-    <form method="POST" class="button-container-select-level">
-        <button type="submit" class="btn button-select-level" name="btn" value="2">Второй режим</button>
-    </form>
-
-    <form method="POST" class="button-container-select-level" style="margin-top: 80px">
-        <button type="submit" class="btn button-select-level" name="btn" value="0">Дополнительный режим</button>
-    </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

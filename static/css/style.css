@@ -17,7 +17,7 @@
     background-color: #f1f1f1;
     padding: 5px;
     text-align: center;
-    margin-bottom: 25vh;
+    margin-bottom: 20vh;
     padding-top: 15px;
 }
 
@@ -149,7 +149,7 @@
 }
 
 .button-audio-container {
-    margin-top: 30px;
+    margin-top: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -179,7 +179,7 @@
 }
 
 .hr-form-login {
-    margin-top: 55px;
+    margin-top: 127px;
 }
 
 .p-login {
@@ -188,7 +188,7 @@
 }
 
 .hr-form-register {
-    margin-top: 45px;
+    margin-top: 25px;
 }
 
 .p-form-login {
@@ -246,7 +246,6 @@ body, .div-main {
     color: black;
 }
 .main-about-project {
-    margin-top: 10px;
     text-align: center;
     line-height: 1.5;
     font-size: 14px;
@@ -264,7 +263,7 @@ body, .div-main {
 }
 .main-back-main {
     margin: 20px;
-    margin-top: 80px;
+    margin-top: 40px;
 }
 .main-rules a {
     opacity: 0.9;
