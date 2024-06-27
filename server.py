@@ -531,31 +531,32 @@ def leader_board():
 
 @app.route('/additional_mode')
 def additional_mode():
-    return render_template('additional_mode.html')
-
-
-levels_data = []
+    db_sess = db_session.create_session()
+    role = db_sess.query(User).filter(User.name == current_user.name).first().user_type
+    role = False if role == "ученик" else True
+    return render_template('additional_mode.html', teacher=role)
 
 
 @app.route('/editor', methods=['GET', 'POST'])
 def editor():
     form = LevelForm()
+    levels_data = []
     if request.method == 'POST':
         level_name = form.level_name.data
-        for level in form.levels.entries:
+        for i, level in enumerate(form.levels.entries):
             word = level.word.data
             translation = level.translation.data
             image = level.image.data
 
-            levels_data.append({
+            levels_data.append((i + 1, {
                 'level_name': level_name,
                 'word': word,
                 'translation': translation,
                 'image_filename': secure_filename(image.filename)
-            })
+            }))
         print(levels_data)
         levels_data.clear()
-        return redirect('/editor')
+        return redirect('/additional_mode')
 
     return render_template('editor.html', form=form, levels_data=levels_data)
 

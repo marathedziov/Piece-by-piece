@@ -48,8 +48,27 @@
     </div>
 </nav>
 
-<div>
 
+<header class="header-mode1" style="margin-bottom: 100px">
+    <h1>Дополнительные уровни</h1>
+</header>
+
+<div class="container mt-4">
+    <div style="margin-bottom: 200px" align="center">
+        {% if teacher %}
+            <a class="btn wide-button-addmode " href="/editor">Создать уровень</a>
+        {% endif %}
+    </div>
+
+    <div class="input-group" align="center">
+        <input type="text" class="form-control" placeholder="Найти уровень" aria-label="Найти уровень"
+               aria-describedby="button-search">
+        <button class="btn btn-outline-secondary" type="button" id="button-search">Поиск</button>
+    </div>
+
+    <div id="levels-list">
+        <!-- Example of levels list -->
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

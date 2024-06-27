@@ -48,33 +48,38 @@
     </div>
 </nav>
 
-<div class="div-form">
-    <h1 class="h1-form">Добавить уровень</h1>
-    <form action="" method="post" class="form" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
+<div class="container mt-4">
+    <div class="div-form">
+        <h1 class="h1-form">Добавить уровень</h1>
+        <form action="" method="post" class="form" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
 
-        <div class="mb-3">
-            {{ form.level_name.label }}<br>
-            {{ form.level_name(class="form-control") }}<br>
-        </div>
-
-        <div class="mb-3 d-flex align-items-center">
-            <div class="flex-grow-1 me-2">
-                {{ form.number_of_levels.label }}<br>
-                {{ form.number_of_levels(class="form-control", id="number_of_levels") }}<br>
+            <div class="mb-3">
+                {{ form.level_name.label }}<br>
+                {{ form.level_name(class="form-control") }}<br>
             </div>
-            <div>
-                <button type="button" class="btn btn-secondary" onclick="generateFields()">Далее</button>
+
+            <div class="mb-3 d-flex align-items-center">
+                <div class="flex-grow-1 me-2">
+                    {{ form.number_of_levels.label }}<br>
+                    {{ form.number_of_levels(class="form-control", id="number_of_levels") }}<br>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-secondary" onclick="generateFields()">Далее</button>
+                </div>
             </div>
-        </div>
 
-        <div id="dynamic-fields">
-            <!-- Dynamic form fields will be appended here -->
-        </div>
+            <div id="dynamic-fields">
+                <!-- Dynamic form fields will be appended here -->
+            </div>
 
-        <p class="p-form-register">{{ form.submit() }}</p>
-        {{message}}
-    </form>
+            <p class="p-form-register" align="center">
+                {{ form.submit(class="btn btn-primary", disabled=true, id="submit-button") }}
+            </p>
+            {{message}}
+            <br>
+        </form>
+    </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
@@ -92,22 +97,34 @@
             fieldSet.classList.add('row', 'mb-3');
 
             fieldSet.innerHTML = `
-                <div class="col-md-4">
-                    <label for="levels-${i}-word" class="form-label">Слово</label>
-                    <input type="text" class="form-control" id="levels-${i}-word" name="levels-${i}-word" maxlength="100">
-                </div>
-                <div class="col-md-4">
-                    <label for="levels-${i}-translation" class="form-label">Перевод</label>
-                    <input type="text" class="form-control" id="levels-${i}-translation" name="levels-${i}-translation" maxlength="100">
-                </div>
-                <div class="col-md-4">
-                    <label for="levels-${i}-image" class="form-label">Изображение</label>
-                    <input type="file" class="form-control" id="levels-${i}-image" name="levels-${i}-image">
+                <div class="col-md-12 p-3 rounded" style="background-color: grey;">
+                    <label for="levels-${i}-word" class="form-label">Слово${i + 1}</label>
+                    <input type="text" class="form-control" id="levels-${i}-word" name="levels-${i}-word" maxlength="100" style="margin-bottom: 10px;" oninput="checkFields()">
+
+                    <label for="levels-${i}-translation" class="form-label">Перевод${i + 1}</label>
+                    <input type="text" class="form-control" id="levels-${i}-translation" name="levels-${i}-translation" maxlength="100" style="margin-bottom: 10px;" oninput="checkFields()">
+
+                    <label for="levels-${i}-image" class="form-label">Изображение${i + 1}</label>
+                    <input type="file" class="form-control" id="levels-${i}-image" name="levels-${i}-image" style="margin-bottom: 15px;" onchange="checkFields()">
                 </div>
             `;
 
             container.appendChild(fieldSet);
         }
+    }
+
+    function checkFields() {
+        const submitButton = document.getElementById('submit-button');
+        const inputs = document.querySelectorAll('#dynamic-fields input[type="text"], #dynamic-fields input[type="file"]');
+        let allFilled = true;
+
+        inputs.forEach(input => {
+            if (!input.value) {
+                allFilled = false;
+            }
+        });
+
+        submitButton.disabled = !allFilled;
     }
 </script>
 </body>

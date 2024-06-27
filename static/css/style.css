@@ -277,3 +277,19 @@ body, .div-main {
     justify-content: center;
     margin: 20px;
 }
+
+
+
+
+
+.wide-button-addmode {
+    width: 90%;
+    height: 60px;
+    padding: 10px;
+    background-color: orange;
+    font-family: Vag World, sans-serif;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 22px;
+}
