@@ -11,6 +11,7 @@ from data.users import User
 from data.animals import Animal
 from data.ModeOne import ModeOne
 from data.ModeTwo import ModeTwo
+from data.ModeAdditional import ModeAdditional
 from forms.user import RegisterForm, LoginForm, LevelForm
 
 
@@ -543,6 +544,7 @@ def editor():
     levels_data = []
     if request.method == 'POST':
         level_name = form.level_name.data
+        level_oset_name = form.level_oset_name.data
         for i, level in enumerate(form.levels.entries):
             word = level.word.data
             translation = level.translation.data
@@ -550,11 +552,33 @@ def editor():
 
             levels_data.append((i + 1, {
                 'level_name': level_name,
-                'word': word,
-                'translation': translation,
-                'image_filename': secure_filename(image.filename)
+                'tasks': word,
+                'answers': translation,
+                'png': secure_filename(image.filename)
             }))
-        print(levels_data)
+
+            db_sess = db_session.create_session()
+            id = db_sess.query(Animal.id).filter(Animal.name == level_name).all()
+
+            if i == 0:
+                animal = Animal(
+                    mode=3,
+                    name=level_name,
+                    oset_name=level_oset_name
+                )
+                db_sess.add(animal)
+                db_sess.commit()
+
+            level = ModeAdditional(
+                id_animal=id[-1][0],
+                tasks=word,
+                answers=translation,
+                png=secure_filename(image.filename)
+            )
+
+            db_sess.add(level)
+            db_sess.commit()
+
         levels_data.clear()
         return redirect('/additional_mode')
 
