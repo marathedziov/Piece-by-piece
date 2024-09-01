@@ -558,7 +558,6 @@ def editor():
             }))
 
             db_sess = db_session.create_session()
-            id = db_sess.query(Animal.id).filter(Animal.name == level_name).all()
 
             if i == 0:
                 animal = Animal(
@@ -569,8 +568,10 @@ def editor():
                 db_sess.add(animal)
                 db_sess.commit()
 
+            id = db_sess.query(Animal.id).filter(Animal.name == level_name).all()
+
             level = ModeAdditional(
-                id_animal=id[-1][0],
+                id_animal=id,
                 tasks=word,
                 answers=translation,
                 png=secure_filename(image.filename)
