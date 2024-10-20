@@ -487,8 +487,6 @@ def mode_two():
         lst_tasks = json.loads(session.get('lst_tasks'))
         audio = session.get('audio')
 
-        print(audio)
-        print(lst_imgs)
         return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
                                btn_imges=list_button_img_mode2, file_imgs=lst_imgs,
                                user_points=user_points_mode2, correct_audio=audio,
@@ -508,8 +506,6 @@ def mode_two():
     lst_tasks = json.loads(session.get('lst_tasks'))
     audio = session.get('audio')
 
-    print(audio)
-    print(lst_imgs)
     return render_template('mode_two.html', question="Послушай диктора и выбери названную им фигуру",
                            btn_imges=list_button_img_mode2, file_imgs=lst_imgs,
                            user_points=user_points_mode2, correct_audio=audio,
@@ -597,60 +593,57 @@ def add_level():
     form = LevelForm()
     levels_data = []
     if request.method == 'POST':
-
         level_name = form.level_name.data
         level_oset_name = form.level_oset_name.data
+
+        db_sess = db_session.create_session()
+        animal = db_sess.query(Animal).filter(Animal.name == level_name).first()
+        if animal is None:
+            animal = Animal(
+                mode=3,
+                name=level_name,
+                oset_name=level_oset_name
+            )
+            db_sess.add(animal)
+            db_sess.commit()
+
+        animal_counter = animal.id
+
         for i, level in enumerate(form.levels.entries):
             word = level.word.data
             translation = level.translation.data
             image = level.image.data
 
+            filename = f"3_{animal_counter}_{i + 1}.png"
             levels_data.append((i + 1, {
                 'level_name': level_name,
                 'tasks': word,
                 'answers': translation,
-                'png': secure_filename(image.filename)
+                'png': filename
             }))
-            print(levels_data)
-            db_sess = db_session.create_session()
-
-            if i == 0:
-                animal = Animal(
-                    mode=3,
-                    name=level_name,
-                    oset_name=level_oset_name
-                )
-                db_sess.add(animal)
-                db_sess.commit()
-
-            id = db_sess.query(Animal.id).filter(Animal.name == level_name).first()[0]
 
             level = ModeAdditional(
-                id_animal=id,
+                id_animal=animal_counter,
                 tasks=word,
                 answers=translation,
-                png=secure_filename(image.filename)
+                png=filename
             )
-
             db_sess.add(level)
             db_sess.commit()
 
         levels_data.clear()
-        number_of_levels = int(request.form.get('number_of_levels', 0))
         uploaded_files = []
 
-        for i in range(number_of_levels):
+        for i in range(int(request.form.get('number_of_levels', 0))):
             word = request.form.get(f'levels-{i}-word')
             translation = request.form.get(f'levels-{i}-translation')
             image_file = request.files.get(f'levels-{i}-image')
 
             if image_file and allowed_file(image_file.filename):
-                animal = db_sess.query(Animal).filter(Animal.name == level_name).first()
-                animal_counter = animal.id
                 filename = f"3_{animal_counter}_{i + 1}.png"
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                image_file.save(file_path)  # Сохранение файла на сервере
-                uploaded_files.append(file_path)  # Добавление пути к файлу в список
+                image_file.save(file_path)
+                uploaded_files.append(file_path)
 
         return redirect('/additional_mode')
 
