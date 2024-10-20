@@ -23,7 +23,7 @@
                 <a class="dropdown-item" href="#">Имя: {{ current_user.name }}</a>
                 <a class="dropdown-item" href="/logout">Выйти</a>
             </div>
-             {% endif %}
+            {% endif %}
         </div>
         <a class="navbar-brand" href="#">{{user_points}}</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -51,9 +51,7 @@
 <div class="container mt-4">
     <div class="div-form">
         <h1 class="h1-form">Добавить уровень</h1>
-        <form action="" method="post" class="form" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
-
+        <form action="/add_level" method="post" class="form" enctype="multipart/form-data">
             <div class="mb-3">
                 {{ form.level_name.label }}<br>
                 {{ form.level_name(class="form-control") }}<br>
@@ -75,14 +73,13 @@
             </div>
 
             <div id="dynamic-fields">
-                <!-- Dynamic form fields will be appended here -->
+                <!-- Динамические поля для загрузки изображений и ввода данных -->
             </div>
 
-            <p class="p-form-register" align="center">
-                {{ form.submit(class="btn btn-primary", disabled=true, id="submit-button") }}
+            <p align="center">
+                <input type="submit" class="btn btn-primary" id="submit-button" value="Сохранить уровни" disabled>
             </p>
-            {{message}}
-            <br>
+            {{ message }}
         </form>
     </div>
 </div>
@@ -103,13 +100,13 @@
 
             fieldSet.innerHTML = `
                 <div class="col-md-12 p-3 rounded" style="background-color: grey;">
-                    <label for="levels-${i}-word" class="form-label">Слово${i + 1}</label>
+                    <label for="levels-${i}-word" class="form-label">Слово ${i + 1}</label>
                     <input type="text" class="form-control" id="levels-${i}-word" name="levels-${i}-word" maxlength="100" style="margin-bottom: 10px;" oninput="checkFields()">
 
-                    <label for="levels-${i}-translation" class="form-label">Перевод${i + 1}</label>
+                    <label for="levels-${i}-translation" class="form-label">Перевод ${i + 1}</label>
                     <input type="text" class="form-control" id="levels-${i}-translation" name="levels-${i}-translation" maxlength="100" style="margin-bottom: 10px;" oninput="checkFields()">
 
-                    <label for="levels-${i}-image" class="form-label">Изображение${i + 1}</label>
+                    <label for="levels-${i}-image" class="form-label">Изображение ${i + 1}</label>
                     <input type="file" class="form-control" id="levels-${i}-image" name="levels-${i}-image" style="margin-bottom: 15px;" onchange="checkFields()">
                 </div>
             `;
