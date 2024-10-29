@@ -97,7 +97,7 @@ class Task:
                 random_id = session.get('random_id')
                 session_db = db_session.create_session()
 
-                query = session_db.query(Animal.shape_used).filter(Animal.id == random_id)
+                query = session_db.query(Animal.additional_parameters).filter(Animal.id == random_id)
                 list_button_img_mode2 = [animal[0] for animal in query.all()][0].split(', ')
                 session_db.close()
 

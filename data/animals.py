@@ -9,6 +9,6 @@ class Animal(SqlAlchemyBase):
     mode = Column(String)
     name = Column(String)
     oset_name = Column(String)
-    shape_used = Column(String)
+    additional_parameters = Column(String)
 
     mode_one = relationship("ModeOne", back_populates="animal")

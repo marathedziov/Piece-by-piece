@@ -60,11 +60,14 @@
         {% endif %}
     </div>
 
-    <div class="input-group" align="center">
-        <input type="text" class="form-control" placeholder="Найти уровень" aria-label="Найти уровень"
-               aria-describedby="button-search">
-        <button class="btn btn-outline-secondary" type="button" id="button-search">Поиск</button>
-    </div>
+
+    <form id="searchForm" class="d-flex mb-3">
+        <input type="text" class="form-control me-2" id="searchQuery" placeholder="Введите номер уровня" required>
+        <button type="submit" class="btn btn-outline-secondary">Поиск</button>
+    </form>
+
+    <div id="result"></div>
+
 
     <div id="levels-list">
         <!-- Example of levels list -->
