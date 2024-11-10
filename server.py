@@ -349,13 +349,13 @@ def mode_one():
                 question = lst_tasks[current_question][0]
             else:
                 question = ""
-
+            mode_value = session.get('mode_value')
             return render_template('mode_one.html', question=question,
                                    btn_texts=list_button_text_mode1, file_imgs=lst_imgs,
                                    user_points=user_points_mode1, correct_question=current_question,
                                    len_lst_tasks=len(lst_tasks), name_animal=name_animal,
                                    curent_hint=current_hint, hint_text=hint_text,
-                                   btn_hint_text=btn_hint_text)
+                                   btn_hint_text=btn_hint_text, mode_value=mode_value)
 
     if request.method == 'GET':
         user_input = request.args.get('animal')
@@ -378,12 +378,13 @@ def mode_one():
         question = lst_tasks[current_question][0]
     except Exception as e:
         question = e
+    mode_value = session.get('mode_value')
     return render_template('mode_one.html', question=question,
                            btn_texts=list_button_text_mode1, file_imgs=lst_imgs,
                            user_points=user_points_mode1, correct_question=current_question,
                            len_lst_tasks=len(lst_tasks), name_animal=name_animal,
                            curent_hint=current_hint, hint_text=hint_text,
-                           btn_hint_text=btn_hint_text)
+                           btn_hint_text=btn_hint_text, mode_value=mode_value)
 
 
 @app.route('/mode_two', methods=['GET', 'POST'])

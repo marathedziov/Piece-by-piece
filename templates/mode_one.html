@@ -58,9 +58,15 @@
 </header>
 
 <main class="main-mode1">
-    {% for img in file_imgs %}
-    <img src="static/img/mode1/{{img}}" alt="{{ question }}" class="img-mode1">
-    {% endfor %}
+    {% if mode_value == 1 %}
+        {% for img in file_imgs %}
+            <img src="static/img/mode1/{{img}}" alt="{{ question }}" class="img-mode1">
+        {% endfor %}
+    {% elif mode_value == 3 %}
+        {% for img in file_imgs %}
+            <img src="static/img/uploads/{{img}}" alt="{{ question }}" class="img-mode1">
+        {% endfor %}
+    {% endif %}
 </main>
 {% if correct_question != len_lst_tasks %}
 <form method="POST" class="button-container-mode1">
