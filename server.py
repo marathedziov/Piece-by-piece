@@ -42,6 +42,7 @@ class Task:
     def get_tasks_by_random_id(self):
         mode_value = session.get("mode_value", 1)
         random_id = session.get("random_id", 1)
+        id_animal_modeadd = session.get("id_animal_modeadd", 5)
 
         if mode_value == 1:
             session_db = db_session.create_session()
@@ -66,14 +67,31 @@ class Task:
                 lst_tasks.append(lst_task)
             random.shuffle(lst_tasks)
             session["lst_tasks"] = json.dumps(lst_tasks)
+        elif mode_value == 3:
+            session_db = db_session.create_session()
+            query_tasks = session_db.query(ModeAdditional).filter(ModeAdditional.id_animal == id_animal_modeadd).all()
+            session_db.close()
+
+            lst_tasks = list()
+            for i_task in query_tasks:
+                lst_task = [i_task.tasks, i_task.answers, i_task.png]
+                lst_tasks.append(lst_task)
+            random.shuffle(lst_tasks)
+            session["lst_tasks"] = json.dumps(lst_tasks)
 
     def get_name_animal(self):
         session_db = db_session.create_session()
-
-        random_id = session.get("random_id", 1)
-        name_animal = session_db.query(Animal.oset_name).filter(Animal.id == random_id).first()
-        session_db.close()
-        session['name_animal'] = name_animal[0]
+        mode_value = session.get('mode_value', 1)
+        if mode_value in [1, 2]:
+            random_id = session.get("random_id", 1)
+            name_animal = session_db.query(Animal.oset_name).filter(Animal.id == random_id).first()
+            session_db.close()
+            session['name_animal'] = name_animal[0]
+        elif mode_value == 3:
+            id_animal_modeadd = session.get("id_animal_modeadd")
+            name_animal = session_db.query(Animal.oset_name).filter(Animal.id == id_animal_modeadd).first()
+            session_db.close()
+            session['name_animal'] = name_animal[0]
 
     def texts_by_level(self):
         mode_value = session.get('mode_value', 1)
@@ -81,7 +99,7 @@ class Task:
         lst_tasks = json.loads(session.get('lst_tasks', []))
 
         if current_question < len(lst_tasks):
-            if mode_value == 1:
+            if mode_value in [1, 3]:
                 list_random_wrong_words = []
                 while len(list_random_wrong_words) < 3:
                     random_index = random.choice(range(len(lst_tasks)))
@@ -244,9 +262,10 @@ def mode_one():
     lst_imgs = json.loads(session.get('lst_imgs', []))
     count_wrong_answer = session.get('count_wrong_answer')
     name_animal = session.get('name_animal')
-    user_points_mode1 = session.get('user_points_mode1')
     current_hint = session.get('current_hint')
+    user_points_mode1 = session.get('user_points_mode1')
     list_button_text_mode1 = json.loads(session.get('list_button_text_mode1'))
+
     if current_question < len(lst_tasks):
         question = lst_tasks[current_question][0]
 
@@ -539,49 +558,7 @@ def additional_mode():
 @app.route('/editor', methods=['GET', 'POST'])
 def editor():
     form = LevelForm()
-    levels_data = []
-    if request.method == 'POST':
-        level_name = form.level_name.data
-        level_oset_name = form.level_oset_name.data
-        for i, level in enumerate(form.levels.entries):
-            word = level.word.data
-            translation = level.translation.data
-            image = level.image.data
-
-            levels_data.append((i + 1, {
-                'level_name': level_name,
-                'tasks': word,
-                'answers': translation,
-                'png': secure_filename(image.filename)
-            }))
-
-            db_sess = db_session.create_session()
-
-            if i == 0:
-                animal = Animal(
-                    mode=3,
-                    name=level_name,
-                    oset_name=level_oset_name
-                )
-                db_sess.add(animal)
-                db_sess.commit()
-
-            id = db_sess.query(Animal.id).filter(Animal.name == level_name).all()
-
-            level = ModeAdditional(
-                id_animal=id,
-                tasks=word,
-                answers=translation,
-                png=secure_filename(image.filename)
-            )
-
-            db_sess.add(level)
-            db_sess.commit()
-
-        levels_data.clear()
-        return redirect('/additional_mode')
-
-    return render_template('editor.html', form=form, levels_data=levels_data)
+    return render_template('editor.html', form=form)
 
 
 def allowed_file(filename):
@@ -608,7 +585,7 @@ def add_level():
             db_sess.commit()
 
         animal_counter = animal.id
-
+        
         for i, level in enumerate(form.levels.entries):
             word = level.word.data
             translation = level.translation.data
@@ -645,7 +622,11 @@ def add_level():
                 image_file.save(file_path)
                 uploaded_files.append(file_path)
 
-        return redirect('/additional_mode')
+        session['mode_value'] = 3
+        session["id_animal_modeadd"] = animal_counter
+        task.get_all_from_task()
+        task.update_level()
+        return redirect("/mode_one")
 
     return render_template('editor.html', form=form, levels_data=levels_data)
 
