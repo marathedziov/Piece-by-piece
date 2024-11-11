@@ -48,7 +48,6 @@
     </div>
 </nav>
 
-
 <header class="header-mode1" style="margin-bottom: 100px">
     <h1>Дополнительные уровни</h1>
 </header>
@@ -61,18 +60,30 @@
     </div>
 
 
-    <form id="searchForm" class="d-flex mb-3">
-        <input type="text" class="form-control me-2" id="searchQuery" placeholder="Введите номер уровня" required>
+    <form id="searchForm" class="d-flex mb-3" action="/additional_mode" method="POST">
+        <input type="number" class="form-control me-2" name="level_number" id="searchQuery" placeholder="Введите номер уровня" required>
         <button type="submit" class="btn btn-outline-secondary">Поиск</button>
     </form>
+    {% if get_flashed_messages() %}
+        <div class="alert alert-danger" role="alert">
+            {% for message in get_flashed_messages() %}
+                <p>{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <div id="result"></div>
-
 
     <div id="levels-list">
         <!-- Example of levels list -->
     </div>
 </div>
+
+<script>
+    document.getElementById('searchQuery').addEventListener('input', function (e) {
+        this.value = this.value.replace(/[^0-9]/g, '');  // Убираем все нечисловые символы
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

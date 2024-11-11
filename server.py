@@ -2,7 +2,7 @@ import os
 import random
 import json
 
-from flask import Flask, render_template, redirect, request, session
+from flask import Flask, render_template, redirect, request, session, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.utils import secure_filename
 
@@ -548,11 +548,37 @@ def leader_board():
     return render_template('leader_board.html', users=enumerated_users)
 
 
-@app.route('/additional_mode')
+@app.route('/additional_mode', methods=['GET', 'POST'])
 def additional_mode():
     db_sess = db_session.create_session()
     role = db_sess.query(User).filter(User.name == current_user.name).first().user_type
     role = False if role == "ученик" else True
+
+    if request.method == 'POST':
+        # Получаем значение уровня
+        level_number = request.form.get('level_number')
+
+        # Проверяем, является ли level_number числом
+        if level_number.isdigit():
+            level_number = int(level_number)
+
+            # Проверка существования id в таблице
+            mode_entry = db_sess.query(ModeAdditional).filter(ModeAdditional.id_animal == level_number).first()
+            if mode_entry:
+                # Если запись найдена, выполняем действия
+                session['mode_value'] = 3
+                session["id_animal_modeadd"] = level_number
+                task.get_all_from_task()
+                task.update_level()
+                return redirect("/mode_one")
+            else:
+                # Если записи нет, выводим сообщение об ошибке
+                flash("Уровень с таким номером не найден.")
+                return redirect("/additional_mode")
+        else:
+            flash("Введите корректный номер уровня.")
+            return redirect("/additional_mode")
+
     return render_template('additional_mode.html', teacher=role)
 
 
@@ -570,9 +596,10 @@ def allowed_file(filename):
 def add_level():
     form = LevelForm()
     levels_data = []
+
     if request.method == 'POST':
-        level_name = form.level_name.data
-        level_oset_name = form.level_oset_name.data
+        level_name = form.level_name.data.lower()
+        level_oset_name = form.level_oset_name.data.lower()
 
         db_sess = db_session.create_session()
         animal = db_sess.query(Animal).filter(Animal.name == level_name).first()
@@ -586,10 +613,10 @@ def add_level():
             db_sess.commit()
 
         animal_counter = animal.id
-        
+
         for i, level in enumerate(form.levels.entries):
-            word = level.word.data
-            translation = level.translation.data
+            word = f'На осетинском языке "{level.word.data.lower()}" это:'
+            translation = level.translation.data.lower()
             image = level.image.data
 
             filename = f"3_{animal_counter}_{i + 1}.png"
