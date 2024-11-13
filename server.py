@@ -650,11 +650,7 @@ def add_level():
                 image_file.save(file_path)
                 uploaded_files.append(file_path)
 
-        session['mode_value'] = 3
-        session["id_animal_modeadd"] = animal_counter
-        task.get_all_from_task()
-        task.update_level()
-        return redirect("/mode_one")
+        return render_template('show_id_animal.html', animal_counter=animal_counter)
 
     return render_template('editor.html', form=form, levels_data=levels_data)
 
