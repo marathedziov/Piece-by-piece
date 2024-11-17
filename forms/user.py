@@ -30,7 +30,7 @@ class LevelEntryForm(FlaskForm):
 class LevelForm(FlaskForm):
     level_name = StringField('Название уровня', validators=[DataRequired()],
                              render_kw={"class": "form-control", "maxlength": "100"})
-    level_oset_name = StringField('Имя животного на осетинском', validators=[DataRequired()],
+    level_oset_name = StringField('Название на осетинском', validators=[DataRequired()],
                              render_kw={"class": "form-control", "maxlength": "100"})
     number_of_levels = IntegerField('Количество частей', validators=[DataRequired()],
                                     render_kw={"class": "form-control", "min": "1"})
