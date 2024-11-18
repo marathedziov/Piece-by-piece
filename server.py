@@ -540,7 +540,8 @@ def leader_board():
     db_sess = db_session.create_session()
     users = db_sess.query(User).all()
 
-    user_points = [(user.user_points_mode1 + user.user_points_mode2, user) for user in users]
+    user_points = [(user.user_points_mode1 + user.user_points_mode2, user) for user in users
+                   if user.user_points_mode1 + user.user_points_mode2 > 0]
 
     sorted_users = sorted(user_points, key=lambda x: x[0], reverse=True)
 
