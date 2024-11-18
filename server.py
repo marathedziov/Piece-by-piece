@@ -555,16 +555,19 @@ def additional_mode():
     role = False if role == "ученик" else True
 
     if request.method == 'POST':
+        print(1)
         # Получаем значение уровня
         level_number = request.form.get('level_number')
 
         # Проверяем, является ли level_number числом
         if level_number.isdigit():
+            print(2)
             level_number = int(level_number)
 
             # Проверка существования id в таблице
             mode_entry = db_sess.query(ModeAdditional).filter(ModeAdditional.id_animal == level_number).first()
             if mode_entry:
+                print(3)
                 # Если запись найдена, выполняем действия
                 session['mode_value'] = 3
                 session["id_animal_modeadd"] = level_number
