@@ -281,7 +281,7 @@ def mode_one():
             user_input = request.form.get('animal')
             flag_animal = task.check_answer_animal(user_input)
             if flag_animal:
-                return redirect("/select_level")
+                return redirect("/show_points")
             else:
                 user_points_mode1 -= 5
                 if user_points_mode1 < 0:
@@ -387,7 +387,7 @@ def mode_two():
             user_input = request.form.get('animal')
             flag_animal = task.check_answer_animal(user_input)
             if flag_animal:
-                return redirect("/select_level")
+                return redirect("/show_points")
             else:
                 user_points_mode2 -= 5
                 if user_points_mode2 < 0:
@@ -502,6 +502,17 @@ def mode_two():
                            btn_hint_text=btn_hint_text)
 
 
+@app.route('/show_points')
+def show_points():
+    mode_value = int(session.get('mode_value'))
+    if mode_value == 1 or mode_value == 3:
+        user_points_mode1 = int(session.get('user_points_mode1'))
+        return render_template("show_points.html", user_points=user_points_mode1)
+    elif mode_value == 2:
+        user_points_mode2 = int(session.get('user_points_mode2'))
+        return render_template("show_points.html", user_points=user_points_mode2)
+
+
 @app.route('/leader_board')
 def leader_board():
     db_sess = db_session.create_session()
@@ -523,24 +534,17 @@ def additional_mode():
     role = False if role == "ученик" else True
 
     if request.method == 'POST':
-        # Получаем значение уровня
         level_number = request.form.get('level_number')
-
-        # Проверяем, является ли level_number числом
         if level_number.isdigit():
             level_number = int(level_number)
-
-            # Проверка существования id в таблице
             mode_entry = db_sess.query(ModeAdditional).filter(ModeAdditional.id_animal == level_number).first()
             if mode_entry:
-                # Если запись найдена, выполняем действия
                 session['mode_value'] = 3
                 session["id_animal_modeadd"] = level_number
                 task.get_all_from_task()
                 task.update_level()
                 return redirect("/mode_one")
             else:
-                # Если записи нет, выводим сообщение об ошибке
                 flash("Уровень с таким номером не найден.")
                 return redirect("/additional_mode")
         else:
