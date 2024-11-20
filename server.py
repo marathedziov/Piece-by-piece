@@ -357,23 +357,6 @@ def mode_one():
                                    curent_hint=current_hint, hint_text=hint_text,
                                    btn_hint_text=btn_hint_text, mode_value=mode_value)
 
-    if request.method == 'GET':
-        user_input = request.args.get('animal')
-
-        if user_input is not None:
-            flag_animal = task.check_answer_animal(user_input)
-            if flag_animal:
-                return redirect("/select_level")
-            else:
-                user_points_mode1 -= 5
-                session["user_points_mode1"] = user_points_mode1
-
-        else:
-            user_points_mode1 -= 5
-            if user_points_mode1 < 0:
-                user_points_mode1 = 0
-            session["user_points_mode1"] = user_points_mode1
-
     try:
         question = lst_tasks[current_question][0]
     except Exception as e:
@@ -480,22 +463,6 @@ def mode_two():
                                    curent_hint=current_hint, hint_text=hint_text,
                                    btn_hint_text=btn_hint_text)
 
-    if request.method == 'GET':
-        user_input = request.args.get('animal')
-
-        if user_input is not None:
-            flag_animal = task.check_answer_animal(user_input)
-            if flag_animal:
-                return redirect("/select_level")
-            else:
-                user_points_mode2 -= 5
-                session["user_points_mode2"] = user_points_mode2
-        else:
-            user_points_mode2 -= 5
-            if user_points_mode2 < 0:
-                user_points_mode2 = 0
-            session["user_points_mode2"] = user_points_mode2
-
         name_animal = session.get('name_animal')
         user_points_mode2 = int(session.get('user_points_mode2'))
         current_hint = int(session.get('current_hint'))
@@ -556,19 +523,16 @@ def additional_mode():
     role = False if role == "ученик" else True
 
     if request.method == 'POST':
-        print(1)
         # Получаем значение уровня
         level_number = request.form.get('level_number')
 
         # Проверяем, является ли level_number числом
         if level_number.isdigit():
-            print(2)
             level_number = int(level_number)
 
             # Проверка существования id в таблице
             mode_entry = db_sess.query(ModeAdditional).filter(ModeAdditional.id_animal == level_number).first()
             if mode_entry:
-                print(3)
                 # Если запись найдена, выполняем действия
                 session['mode_value'] = 3
                 session["id_animal_modeadd"] = level_number
