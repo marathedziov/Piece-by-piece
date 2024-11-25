@@ -20,8 +20,8 @@ class Task:
         session["current_question"] = 0
         session["count_wrong_answer"] = 0
         session["mode_value"] = 0
-        session["user_points_mode1"] = 105
-        session["user_points_mode2"] = 105
+        session["user_points_mode1"] = 100
+        session["user_points_mode2"] = 100
         session["current_hint"] = 0
         session["btn_hint_text"] = "Подсказка"
         session["hint_text"] = ""
@@ -127,8 +127,8 @@ class Task:
         session["lst_imgs"] = json.dumps([])
 
     def update_level(self):
-        session["user_points_mode1"] = 105
-        session["user_points_mode2"] = 105
+        session["user_points_mode1"] = 100
+        session["user_points_mode2"] = 100
 
         session["btn_hint_text"] = "Подсказка"
         session["hint_text"] = ""
