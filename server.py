@@ -324,11 +324,11 @@ def mode_one():
             btn_hint_text = "Подсказка"
             hint_text = ""
             if current_hint == 1:
-                hint_text = f"Букв в слове: {len(str(name_animal))}"
+                hint_text = f"Символов в слове: {len(str(name_animal))}"
                 user_points_mode1 -= 10
                 btn_hint_text = "Подсказка"
             elif current_hint == 2:
-                hint_text = f"Первая буква: {name_animal[0]}"
+                hint_text = f"Первый символ: {name_animal[0]}"
                 user_points_mode1 -= 10
                 btn_hint_text = "Сдаюсь"
             elif current_hint >= 3:
@@ -428,11 +428,11 @@ def mode_two():
             session["current_hint"] = current_hint
 
             if current_hint == 1:
-                hint_text = f"Букв в слове: {len(str(name_animal))}"
+                hint_text = f"Символов в слове: {len(str(name_animal))}"
                 user_points_mode2 -= 10
                 btn_hint_text = "Подсказка"
             elif current_hint == 2:
-                hint_text = f"Первая буква: {name_animal[0]}"
+                hint_text = f"Первый символ: {name_animal[0]}"
                 user_points_mode2 -= 10
                 btn_hint_text = "Сдаюсь"
             elif current_hint >= 3:
